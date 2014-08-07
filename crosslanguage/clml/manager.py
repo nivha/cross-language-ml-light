@@ -21,11 +21,9 @@ def download_cateogries(language, categories, max_articles_num):
 
 
 
-# en_cs = ['Asian_art', 'Latin_American_art']
-# es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
+en_cs = ['Epistemology', 'Ethics', 'Dark_matter', 'Black_holes', 'Asian_art', 'Latin_American_art']
+es_cs = ['Epistemolog%C3%ADa', '%C3%89tica', 'Materia_oscura', 'Agujeros_negros', 'Arte_de_Asia', 'Arte_latinoamericano']
 
-en_cs = ['Black_holes', 'Dark_matter']
-es_cs = ['Agujeros_negros', 'Materia_oscura']
 
 for c in en_cs:
     # clean_untranslated_articels('en', c)
