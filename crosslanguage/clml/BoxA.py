@@ -128,7 +128,6 @@ class SimpleClassifierTester(object):
         return score
 
 
-
 if __name__ == '__main__':
     # en_cs = ['Asian_art', 'Latin_American_art']
     # es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
