@@ -119,7 +119,7 @@ if __name__=="__main__":
     # wf = WikiFetcher('en', "International_Young_Physicists'_Tournament")
     # wf = WikiFetcher('es', "Libros_de_ciencias_de_la_computación")
     # wf = WikiFetcher('es', "Sistemas_de_gestión_empresarial_libres").fetch_to_files()
-    # wf = cProfile.run("WikiFetcher('en', 'Aetobatus').fetch_to_files()")
+    wf = cProfile.run("WikiFetcher('en', 'Aetobatus').fetch_to_files()")
 
     # some real shit now:
     # en_categories = ['Dark_matter', 'Black_holes']
@@ -128,16 +128,16 @@ if __name__=="__main__":
     # en_categories = ['Asian_art', 'Latin_American_art']
     # es_categories = ['Arte_de_Asia', 'Arte_latinoamericano']
 
-    en_categories = ['Cognitive_biases', 'Epistemological_theories']
-    es_categories = ['Sesgos_cognitivos', 'Teorías_epistemológicas']
-
-    for category in en_categories:
-        print category
-        wf = WikiFetcher('en', category, 300, None, 10).fetch_to_files()
-        # cProfile.run('wf.fetch_to_files()')
-    for category in es_categories:
-        print category
-        wf = WikiFetcher('es', category, 200, None, 10).fetch_to_files()
+    # en_categories = ['Cognitive_biases', 'Epistemological_theories']
+    # es_categories = ['Sesgos_cognitivos', 'Teorías_epistemológicas']
+    #
+    # for category in en_categories:
+    #     print category
+    #     wf = WikiFetcher('en', category, 300, None, 10).fetch_to_files()
+    #     # cProfile.run('wf.fetch_to_files()')
+    # for category in es_categories:
+    #     print category
+    #     wf = WikiFetcher('es', category, 200, None, 10).fetch_to_files()
 
 
 
