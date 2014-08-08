@@ -1,4 +1,5 @@
 import os
+import random
 import numpy
 
 os.environ["DJANGO_SETTINGS_MODULE"] = 'crosslanguage.settings'
@@ -34,13 +35,13 @@ class SimpleClassifier(object):
         Train the classifier on a given data
         :return:
         """
-        train_data = [article.articlecontent_set.get(language=self.language) for article in source_articles]
+        train_data = [article.articlecontent_set.get(language=self.language).text for article in source_articles]
         train_target = [article.category.name for article in source_articles]
 
         self.clf = self.clf.fit(train_data, train_target)
 
     def test(self, test_articles):
-        test_data = [article.articlecontent_set.get(language=self.language) for article in test_articles]
+        test_data = [article.articlecontent_set.get(language=self.language).text for article in test_articles]
         test_target = [article.category.name for article in test_articles]
 
         predicted = self.clf.predict(test_data)
@@ -58,18 +59,30 @@ if __name__ == '__main__':
     # Built total train data and target lists
     data = []
     target = []
-    for category in trainc:
-        for article in category.article_set.all():
-            training_text = article.get_original_content().text
-            data.append(training_text)
-            target.append(category.name)
+    all_articles = []
+    # for category in trainc:
+    #     for article in category.article_set.all():
+    #         training_text = article.get_original_content().text
+    #         data.append(training_text)
+    #         target.append(category.name)
+
+    all_articles = reduce(lambda a, b: a + b,
+                          map(lambda category: list(category.article_set.all()), trainc))
+    random.shuffle(all_articles)
 
     simple_classifier = SimpleClassifier('es', MultinomialNB(alpha=1e-2, fit_prior=False))
 
-    clf = simple_classifier.clf
-    scores = cross_validation.cross_val_score(clf, data, target, cv=10)
+    foldsize = len(all_articles) / 5
+    learn_articles = all_articles[:4*foldsize]
+    test_articles = all_articles[4*foldsize:]
 
-    print scores
-    print sum(scores)*1.0 / len(scores)
+    simple_classifier.learn(learn_articles)
+
+    print simple_classifier.test(test_articles)
+
+    # clf = simple_classifier.clf
+    # scores = cross_validation.cross_val_score(clf, data, target, cv=10)
+    # print scores
+    # print sum(scores)*1.0 / len(scores)
 
 

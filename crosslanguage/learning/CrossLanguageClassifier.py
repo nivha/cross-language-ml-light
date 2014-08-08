@@ -83,7 +83,7 @@ class CrossLanguageClassifier(object):
         predicted = self.simple_classifier.predict(test_data)
         result = predicted == test_target
         score = numpy.mean(result)
-        print 'scored:', numpy.sum(result), 'out of:', numpy.size(result)
+        # print 'scored:', numpy.sum(result), 'out of:', numpy.size(result)
         return score
 
 
@@ -101,18 +101,26 @@ if __name__ == '__main__':
     testc = map(lambda x: Category.objects.get(name=x), es_cs)
 
     # Built total train data and target lists
-    train_articles = []
-    test_articles = []
+    # train_articles = []
+    # test_articles = []
+    #
+    # for category in trainc:
+    #     for article in category.article_set.all():
+    #         if article.has_translations():
+    #             train_articles.append(article)
+    #
+    # for category in testc:
+    #     for article in category.article_set.all():
+    #         if article.has_translations():
+    #             test_articles.append(article)
 
-    for category in trainc:
-        for article in category.article_set.all():
-            if article.has_translations():
-                train_articles.append(article)
+    train_articles = filter(lambda article: article.has_translations(),
+                            reduce(lambda a, b: a + b,
+                                   map(lambda category: list(category.article_set.all()), trainc)))
 
-    for category in testc:
-        for article in category.article_set.all():
-            if article.has_translations():
-                test_articles.append(article)
+    test_articles = filter(lambda article: article.has_translations(),
+                           reduce(lambda a, b: a + b,
+                                  map(lambda category: list(category.article_set.all()), testc)))
 
     clclf = CrossLanguageClassifier('en',
                                     'es',
