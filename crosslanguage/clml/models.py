@@ -36,6 +36,10 @@ class Category(models.Model):
         """ returns the folder where this category is found in the fs """
         pass
 
+    def get_translated_articles(self):
+        # return self.article_set.filter(language__ne=) TODO continue
+        pass
+
     def __unicode__(self):
         return "%s: %s" % (self.language, self.name)
 
@@ -67,6 +71,13 @@ class Article(models.Model):
         Return a set of all translations to this article
         """
         return self.articlecontent_set.exclude(language=self.original_language)
+
+    def has_translations(self):
+        """
+        Returns whether the article has a content which is not in its original language
+        """
+        return self.get_translations().count() > 0
+
 
     def __unicode__(self):
         return "%s: %s, in category %s" % (self.original_language, self.title, self.category.name)
