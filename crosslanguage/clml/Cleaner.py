@@ -1,6 +1,6 @@
 # coding=utf-8
 import os
-import simplejson
+import ujson
 from clml.utils import get_category_folder
 
 __author__ = 'Mojo'
@@ -25,14 +25,14 @@ def clean_english_articles_with_spanish_parallels(en_category_name, es_category_
     for fname in os.listdir(es_folder):
         p = os.path.join(es_folder, fname)
         with open(p) as f:
-            d = simplejson.loads(f.read())
+            d = ujson.loads(f.read())
             es_urls.add(d['original_url'])
 
     to_delete = []
     for fname in os.listdir(en_folder):
         p = os.path.join(en_folder, fname)
         with open(p) as f:
-            d = simplejson.loads(f.read())
+            d = ujson.loads(f.read())
             if d['spanish_url'] in es_urls:
                 to_delete.append(p)
 

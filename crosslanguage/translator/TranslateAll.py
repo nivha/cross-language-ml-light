@@ -88,12 +88,17 @@ if __name__ == '__main__':
     # en_categories = ['Asian_art', 'Latin_American_art']
     # es_categories = ['Arte_de_Asia', 'Arte_latinoamericano']
 
-    en_categories = ['Dark_matter', 'Black_holes']
-    es_categories = ['Materia_oscura', 'Agujeros_negros']
+    # en_categories = ['Dark_matter', 'Black_holes']
+    # es_categories = ['Materia_oscura', 'Agujeros_negros']
+
+    en_categories = ['Epistemology', 'Ethics']
+    es_categories = ['Epistemolog%C3%ADa', '%C3%89tica']
 
     for c in en_categories:
+        print c
         tr = CategoryTranslator(Language(Language.English), [Language(Language.Spanish)], c)
         tr.do_translation()
     for c in es_categories:
+        print c
         tr = CategoryTranslator(Language(Language.Spanish), [Language(Language.English)], c)
         tr.do_translation()

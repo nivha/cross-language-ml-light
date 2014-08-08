@@ -62,10 +62,27 @@ class CategoryFetcher(object):
         closed_categories = set()
         open_categories = [(category_title, 0)]  # (category-title, depth)
         articles = set()
+        depth_categories = {0: [category_title]}
+        current_max_depth = 0
 
-        while open_categories:
+        def pop_category():
+            for depth in range(current_max_depth+1):
+                if depth in depth_categories and depth_categories[depth]:
+                    category = depth_categories[depth].pop(random.randrange(len(depth_categories[depth])))
+                    if len(depth_categories[depth])==0: pass
+                    return category, depth
+            return None, None
 
-            current_category_name, depth = open_categories.pop()
+        def push_category(category, depth):
+            if depth in depth_categories:
+                depth_categories[depth].append(category)
+            else:
+                depth_categories[depth] = [category]
+
+        while True:
+
+            current_category_name, depth = pop_category()
+            if current_category_name is None: return articles
             # quit if max_depth reached
             if max_depth is not None and depth >= max_depth: continue
             # quit if category has already been visited
@@ -75,13 +92,15 @@ class CategoryFetcher(object):
             articles_found = 0
             sublinks = self.get_category_articles(current_category)
             random.shuffle(sublinks)  # shuffle sublinks
+
             for d in sublinks:
-                if self.is_category(d.title):
-                    open_categories.append((d.title, depth+1))
+                if self.is_category(d.title) and d.title not in closed_categories:
+                    push_category(d.title, depth+1)
+                    current_max_depth = depth+1 if depth+1 > current_max_depth else current_max_depth
                 else:  # d is in article
 
                     # break if max articles per subcategory reached (not relevant to root category)
-                    if max_articles_per_subcategory is not None and depth == 0 and articles_found >= 40:
+                    if max_articles_per_subcategory is not None and depth == 0 and articles_found >= 60:
                         continue
                     if max_articles_per_subcategory is not None and depth > 0 and articles_found >= max_articles_per_subcategory:
                         continue
@@ -95,7 +114,7 @@ class CategoryFetcher(object):
 
             closed_categories.add(current_category)
 
-        return articles
+        #return articles
 
 
 

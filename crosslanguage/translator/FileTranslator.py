@@ -1,7 +1,7 @@
 import os
 import urllib
 import urllib2
-import simplejson
+import ujson
 
 os.environ["DJANGO_SETTINGS_MODULE"] = 'crosslanguage.settings'
 from django.conf import settings
@@ -133,7 +133,7 @@ class FileTranslator(object):
     def translate_file(self, path):
         with open(path) as f:
             json = f.read()
-            d = simplejson.loads(json)
+            d = ujson.loads(json)
             text = d['text']
 
             return self.translate(text)

@@ -1,7 +1,7 @@
 # coding=utf-8
 
 import os
-import simplejson
+import ujson
 
 from fetcher.utils import cat_lang
 
@@ -42,7 +42,7 @@ def load_category(language, category_name):
 
         with open(os.path.join(path, filename)) as f:
             json = f.read()
-            d = simplejson.loads(json)
+            d = ujson.loads(json)
             text = d['text']
             title = os.path.splitext(filename)[0]
             article_url = 'http://{:s}.wikipedia.org/wiki/{:s}'.format(
@@ -78,7 +78,7 @@ def load_category(language, category_name):
 
             with open(os.path.join(path, lang_dir, filename)) as f:
                 # json = f.read()
-                # d = simplejson.loads(json)
+                # d = ujson.loads(json)
                 # text = d['text']
                 text = f.read()
 
