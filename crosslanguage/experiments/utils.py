@@ -18,10 +18,12 @@ class ArticleExtractor(object):
         self.target_categories = None
         self.source_articles = None
         self.target_articles = None
+        self.category_map = None
 
         # Run extraction functions
         self.extract_categories_from_names()
         self.extract_translated_articles()
+        self.map_categories()
 
     def extract_categories_from_names(self):
         self.source_categories = [Category.objects.get(name=name) for name in self.source_categories_names]
@@ -35,6 +37,15 @@ class ArticleExtractor(object):
 
         self.source_articles = get_translated(self.source_categories_names)
         self.target_articles = get_translated(self.target_categories_names)
+
+    def map_categories(self):
+        """
+        Create a mapper from target categories to source categories.
+        """
+        source_categories_names = [category.name for category in self.source_categories]
+        target_categories_names = [category.name for category in self.target_categories]
+
+        self.category_map = dict(zip(target_categories_names, source_categories_names))
 
 
 
