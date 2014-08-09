@@ -1,4 +1,5 @@
 import os
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from learning.SimpleClassifier import create_simple_classifier
 
@@ -33,36 +34,34 @@ class Experiment1(object):
         self.classifiers = classifiers
 
     def run(self, output_file=None):
-        output = ''
-        for classifier in self.classifiers:
-            for direction in [Direction.Post, Direction.Pre]:
-                cross_language_classifier = CrossLanguageClassifier(self.source_language,
-                                                                    self.target_language,
-                                                                    create_simple_classifier(classifier),
-                                                                    direction)
+        with open(output_file, 'wb') as f:
 
-                cross_language_classifier.map_categories(self.source_categories, self.target_categories)
+            print 'running experiment 1 on categories ', self.source_categories, self.target_categories
+            output = ''
+            for classifier in self.classifiers:
+                for direction in [Direction.Post, Direction.Pre]:
+                    cross_language_classifier = CrossLanguageClassifier(self.source_language,
+                                                                        self.target_language,
+                                                                        create_simple_classifier(classifier),
+                                                                        direction)
 
-                # Get a list of all articles from both categories
-                train_articles = filter(lambda article: article.has_translations(),
-                                        reduce(lambda a, b: a + b,
-                                               map(lambda category: list(category.article_set.all()), self.source_categories)))
+                    cross_language_classifier.map_categories(self.source_categories, self.target_categories)
 
-                test_articles = filter(lambda article: article.has_translations(),
-                                       reduce(lambda a, b: a + b,
-                                              map(lambda category: list(category.article_set.all()), self.target_categories)))
+                    # Get a list of all articles from both categories
+                    train_articles = filter(lambda article: article.has_translations(),
+                                            reduce(lambda a, b: a + b,
+                                                   map(lambda category: list(category.article_set.all()), self.source_categories)))
 
-                cross_language_classifier.learn(train_articles)
-                score = cross_language_classifier.test(test_articles)
+                    test_articles = filter(lambda article: article.has_translations(),
+                                           reduce(lambda a, b: a + b,
+                                                  map(lambda category: list(category.article_set.all()), self.target_categories)))
 
-                output += 'score: {:f}, direction: {:s}, classifier: {:s}\n'.format(score, classifier, direction)
-                print '.'
+                    cross_language_classifier.learn(train_articles)
+                    score = cross_language_classifier.test(test_articles)
 
-        if output_file is None:
-            print output
-        else:
-            with open(output_file, 'wb') as f:
-                f.write(output)
+                    print '.'
+                    f.write('score: {:f}, direction: {:s}, classifier: {:s}\n'.format(score, classifier, direction))
+                    f.flush()
 
 
 def run_experiment1(en_cs, es_cs, output_file=None):
@@ -78,12 +77,17 @@ def run_experiment1(en_cs, es_cs, output_file=None):
         MultinomialNB(alpha=1e-3, fit_prior=False),
         MultinomialNB(alpha=1e-2, fit_prior=False),
         MultinomialNB(alpha=1e-1, fit_prior=False),
+        KNeighborsClassifier(1, weights='uniform'),
+        KNeighborsClassifier(3, weights='uniform'),
+        KNeighborsClassifier(5, weights='uniform'),
+        KNeighborsClassifier(1, weights='distance'),
+        KNeighborsClassifier(3, weights='distance'),
+        KNeighborsClassifier(5, weights='distance'),
         BernoulliNB(alpha=1.0),
         BernoulliNB(alpha=2.0),
         BernoulliNB(alpha=3.0),
         SVC(),
         SVC(C=1e10),
-        SVC(C=float('inf')),
     ]
 
     exp = Experiment1('en', 'es', en_cs, es_cs, classifiers)

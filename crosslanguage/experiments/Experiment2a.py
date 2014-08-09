@@ -13,9 +13,9 @@ class Experiment2(object):
     """
 
     def _init_(self,
-                source_language, target_language,
-                source_categories_names, target_categories_names,
-                classifiers):
+               source_language, target_language,
+               source_categories_names, target_categories_names,
+               classifiers):
 
         self.source_language = source_language
         self.target_language = target_language
@@ -27,3 +27,4 @@ class Experiment2(object):
         # decide number of units
         for units_num_per_fold in xrange(k_units):
             fold_generator = FoldGenerator()
+

@@ -20,6 +20,30 @@ score: 0.942857, direction: MultinomialNB(alpha=0.01, class_prior=None, fit_prio
 score: 0.942857, direction: MultinomialNB(alpha=0.01, class_prior=None, fit_prior=False), classifier: pre
 score: 0.942857, direction: MultinomialNB(alpha=0.1, class_prior=None, fit_prior=False), classifier: post
 score: 0.928571, direction: MultinomialNB(alpha=0.1, class_prior=None, fit_prior=False), classifier: pre
+score: 0.942857, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=1, p=2, weights='uniform'), classifier: post
+score: 0.928571, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=1, p=2, weights='uniform'), classifier: pre
+score: 0.971429, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=3, p=2, weights='uniform'), classifier: post
+score: 0.914286, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=3, p=2, weights='uniform'), classifier: pre
+score: 0.957143, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=5, p=2, weights='uniform'), classifier: post
+score: 0.900000, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=5, p=2, weights='uniform'), classifier: pre
+score: 0.942857, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=1, p=2, weights='distance'), classifier: post
+score: 0.928571, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=1, p=2, weights='distance'), classifier: pre
+score: 0.971429, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=3, p=2, weights='distance'), classifier: post
+score: 0.914286, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=3, p=2, weights='distance'), classifier: pre
+score: 0.957143, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=5, p=2, weights='distance'), classifier: post
+score: 0.900000, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=5, p=2, weights='distance'), classifier: pre
 score: 0.742857, direction: BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: post
 score: 0.742857, direction: BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: pre
 score: 0.728571, direction: BernoulliNB(alpha=2.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: post
