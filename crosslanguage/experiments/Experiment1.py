@@ -37,7 +37,6 @@ class Experiment1(object):
         with open(output_file, 'wb') as f:
 
             print 'running experiment 1 on categories ', self.source_categories, self.target_categories
-            output = ''
             for classifier in self.classifiers:
                 for direction in [Direction.Post, Direction.Pre]:
                     cross_language_classifier = CrossLanguageClassifier(self.source_language,

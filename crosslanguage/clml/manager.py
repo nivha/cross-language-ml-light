@@ -1,33 +1,43 @@
+# coding=utf-8
 import os
-from clml.Cleaner import clean_untranslated_articels
+from clml.Cleaner import clean_untranslated_articels, clean_english_articles_with_spanish_parallels
 
 from clml.data_load import load_category
-from clml.utils import get_category_folder
+from clml.utils import get_category_folder, Language
+from fetcher.WikiFetcher import WikiFetcher
+from translator.TranslateAll import CategoryTranslator
 
 
 __author__ = 'Niv & Ori'
 
 
-def download_cateogries(language, categories, max_articles_num):
+def download_cateogries(src_language, dst_language, src_c, dst_c):
 
-    # for category in categories:
-    #     wf = WikiFetcher(language, category, max_articles_num)
-    #     wf.fetch_to_files()
+    WikiFetcher(src_language, src_c, 1000, None, 25).fetch_to_files()
+    WikiFetcher(dst_language, dst_c, 1000, None, 25).fetch_to_files()
 
-    # for c in es_categories:
-    #     tr = CategoryTranslator(Language(Language.Spanish), [Language(Language.English)], c)
-    #     tr.do_translation()
-    pass
+    clean_english_articles_with_spanish_parallels(src_c, dst_c)
+
+    src_lang = Language(Language.path_to_lang[src_language])
+    dst_lang = Language(Language.path_to_lang[dst_language])
+    CategoryTranslator(src_lang, [dst_lang], src_c).do_translation()
+    CategoryTranslator(dst_lang, [src_lang], dst_c).do_translation()
+
+    load_category(src_language, src_c)
+    load_category(dst_language, dst_c)
 
 
+# en_cs = ['Epistemology', 'Ethics', 'Dark_matter', 'Black_holes', 'Asian_art', 'Latin_American_art']
+# es_cs = ['Epistemolog%C3%ADa', '%C3%89tica', 'Materia_oscura', 'Agujeros_negros', 'Arte_de_Asia', 'Arte_latinoamericano']
 
-en_cs = ['Epistemology', 'Ethics', 'Dark_matter', 'Black_holes', 'Asian_art', 'Latin_American_art']
-es_cs = ['Epistemolog%C3%ADa', '%C3%89tica', 'Materia_oscura', 'Agujeros_negros', 'Arte_de_Asia', 'Arte_latinoamericano']
+# [Anthropology, Sociology]
+# [Antropología, Sociología]
 
+# [Religion, Religión]
+# [Spirituality, Espiritualidad]
 
-for c in en_cs:
-    # clean_untranslated_articels('en', c)
-    load_category('en', c)
-for c in es_cs:
-    # clean_untranslated_articels('es', c)
-    load_category('es', c)
+# [Marxism, Marxismo]
+# [Anarchism, Anarquismo]
+
+# download_cateogries('en', 'es', 'Asian_art', 'Arte_de_Asia')
+download_cateogries('en', 'es', 'Latin_American_art', 'Arte_latinoamericano')

@@ -100,7 +100,7 @@ class CategoryFetcher(object):
                 else:  # d is in article
 
                     # break if max articles per subcategory reached (not relevant to root category)
-                    if max_articles_per_subcategory is not None and depth == 0 and articles_found >= 60:
+                    if max_articles_per_subcategory is not None and depth == 0 and articles_found >= 50:
                         continue
                     if max_articles_per_subcategory is not None and depth > 0 and articles_found >= max_articles_per_subcategory:
                         continue

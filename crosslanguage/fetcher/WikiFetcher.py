@@ -94,11 +94,11 @@ class WikiFetcher(object):
         }
         return final
 
-
     def fetch_to_files(self):
         """
             Save all category's articles into files in the relevant place
         """
+        print 'Fetching category:', self.category
         if not os.path.exists(self.category_base_dir): os.makedirs(self.category_base_dir)
         articles = self.fetch_raw_articles()
         print 'Fetched {:d} articles'.format(len(articles))

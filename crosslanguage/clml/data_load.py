@@ -56,7 +56,7 @@ def load_category(language, category_name):
                 is_stub=False  # TODO - check in some way whether this is a stub
             )
 
-            article_content = ArticleContent.objects.create(
+            article_content = ArticleContent.objects.get_or_create(
                 article=article,
                 language=article.original_language,
                 text=text,
@@ -93,7 +93,7 @@ def load_category(language, category_name):
                 article = articles[0]
 
                 print 'adding ' + lang_dir + ' translation to ' + article.title + ' , originally in ' + language
-                article_content = ArticleContent.objects.create(
+                article_content = ArticleContent.objects.get_or_create(
                     article=article,
                     language=lang_dir,
                     text=text,

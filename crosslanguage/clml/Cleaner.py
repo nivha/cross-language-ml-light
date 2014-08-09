@@ -17,6 +17,7 @@ def clean_english_articles_with_spanish_parallels(en_category_name, es_category_
     :param es_category_name: name of the respective category in spanish
 
     """
+    print 'cleaning...'
     en_folder = get_category_folder('en', en_category_name)
     es_folder = get_category_folder('es', es_category_name)
 
