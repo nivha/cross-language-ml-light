@@ -128,8 +128,12 @@ if __name__=="__main__":
     # en_categories = ['Asian_art', 'Latin_American_art']
     # es_categories = ['Arte_de_Asia', 'Arte_latinoamericano']
 
-    en_categories = ['Epistemology', 'Ethics']
-    es_categories = ['Epistemología', 'Ética']
+    # en_categories = ['Epistemology', 'Ethics']
+    # es_categories = ['Epistemología', 'Ética']
+
+
+    en_categories = ['Anthropology', 'Sociology']
+    es_categories = ['Antropología', 'Sociología']
 
     for category in en_categories:
         print category
@@ -137,7 +141,7 @@ if __name__=="__main__":
         # cProfile.run('wf.fetch_to_files()')
     for category in es_categories:
         print category
-        wf = WikiFetcher('es', category, 500, None, 25).fetch_to_files()
+        wf = WikiFetcher('es', category, 400, None, 25).fetch_to_files()
 
 
 

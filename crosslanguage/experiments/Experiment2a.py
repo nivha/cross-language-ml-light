@@ -13,6 +13,7 @@ class Experiment2a(object):
 
     """
     k_units = 10
+    max_dst_articles = 200
 
     def __init__(self,
                 source_language, target_language,
@@ -38,13 +39,19 @@ class Experiment2a(object):
 
         # Extract categories from categories_names
         extractor = ArticleExtractor(self.source_categories_names, self.target_categories_names)
-        self.source_articles = extractor.source_articles
-        self.target_articles = extractor.target_articles
+        self.source_articles = list(extractor.source_articles)
+        self.target_articles = list(extractor.target_articles[:self.max_dst_articles])
 
     def get_objects_from_queryset_by_indices(self, queryset, indices):
         return [queryset[i] for i in indices]
 
     def score_clf(self, clf, fold_generator):
+        """
+            Advanced Cros-Validation for our needs for a one-language classifier
+        :param clf:
+        :param fold_generator:
+        :return:
+        """
 
         scores = []
         i = 0
@@ -58,6 +65,7 @@ class Experiment2a(object):
             score = clf.test(testset)
             scores.append(score)
 
+        print scores
         return np.average(scores)
 
 
@@ -65,10 +73,10 @@ class Experiment2a(object):
         pass
 
 
-    def score(self):
+    def score_clclf_clf(self, clclf, clf):
 
-        src_ds_size = self.source_articles.count()
-        dst_ds_size = self.target_articles.count()
+        src_ds_size = len(self.source_articles)
+        dst_ds_size = len(self.target_articles)
 
         beta_scores = []
         for n_units_per_fold in xrange(1, self.k_units):
@@ -83,7 +91,13 @@ class Experiment2a(object):
             # clclf_score = self.score_clclf(clclf, train, test)
             # beta_scores.append( ( beta, (clf_score, clclf_score) ) )
 
-if __name__=="__main__":
+    def score(self):
+        for i in xrange(len(self.clclfs)):
+            clclf = self.clclfs[i]
+            clf = self.clfs[i]
+            self.score_clclf_clf(clclf, clf)
+
+if __name__ == "__main__":
 
     en_cs = ['Epistemology', 'Ethics']
     es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
