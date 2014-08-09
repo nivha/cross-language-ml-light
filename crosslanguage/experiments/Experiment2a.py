@@ -37,12 +37,14 @@ class Experiment2a(object):
         self.clclfs = clclfs
         self.clfs = clfs
 
-        # Extract categories from categories_names
+        # extract categories from categories_names
         extractor = ArticleExtractor(self.source_categories_names, self.target_categories_names)
         self.source_articles = list(extractor.source_articles)
         self.target_articles = list(extractor.target_articles[:self.max_dst_articles])
 
-    def get_objects_from_queryset_by_indices(self, queryset, indices):
+        # shuffle the articles for the learning to be homogeneous..
+
+    def get_articles_from_indices(self, queryset, indices):
         return [queryset[i] for i in indices]
 
     def score_clf(self, clf, fold_generator):
@@ -58,8 +60,8 @@ class Experiment2a(object):
         for train, test in fold_generator:
             print i
             i += 1
-            trainset = self.get_objects_from_queryset_by_indices(self.target_articles, train)
-            testset = self.get_objects_from_queryset_by_indices(self.target_articles, test)
+            trainset = self.get_articles_from_indices(self.target_articles, train)
+            testset = self.get_articles_from_indices(self.target_articles, test)
 
             clf.learn(trainset)
             score = clf.test(testset)
