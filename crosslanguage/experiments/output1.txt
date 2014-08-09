@@ -1,0 +1,40 @@
+score: 0.587017, direction: SGDClassifier(alpha=0.001, class_weight=None, epsilon=0.1, eta0=0.0,
+       fit_intercept=True, l1_ratio=0.15, learning_rate='optimal',
+       loss='hinge', n_iter=5, n_jobs=1, penalty='l2', power_t=0.5,
+       random_state=None, shuffle=False, verbose=0, warm_start=False), classifier: post
+score: 0.533149, direction: SGDClassifier(alpha=0.001, class_weight=None, epsilon=0.1, eta0=0.0,
+       fit_intercept=True, l1_ratio=0.15, learning_rate='optimal',
+       loss='hinge', n_iter=5, n_jobs=1, penalty='l2', power_t=0.5,
+       random_state=None, shuffle=False, verbose=0, warm_start=False), classifier: pre
+score: 0.600829, direction: SGDClassifier(alpha=0.0001, class_weight=None, epsilon=0.1, eta0=0.0,
+       fit_intercept=True, l1_ratio=0.15, learning_rate='optimal',
+       loss='hinge', n_iter=5, n_jobs=1, penalty='l2', power_t=0.5,
+       random_state=None, shuffle=False, verbose=0, warm_start=False), classifier: post
+score: 0.533149, direction: SGDClassifier(alpha=0.0001, class_weight=None, epsilon=0.1, eta0=0.0,
+       fit_intercept=True, l1_ratio=0.15, learning_rate='optimal',
+       loss='hinge', n_iter=5, n_jobs=1, penalty='l2', power_t=0.5,
+       random_state=None, shuffle=False, verbose=0, warm_start=False), classifier: pre
+score: 0.680939, direction: MultinomialNB(alpha=0.001, class_prior=None, fit_prior=False), classifier: post
+score: 0.712707, direction: MultinomialNB(alpha=0.001, class_prior=None, fit_prior=False), classifier: pre
+score: 0.685083, direction: MultinomialNB(alpha=0.01, class_prior=None, fit_prior=False), classifier: post
+score: 0.715470, direction: MultinomialNB(alpha=0.01, class_prior=None, fit_prior=False), classifier: pre
+score: 0.697514, direction: MultinomialNB(alpha=0.1, class_prior=None, fit_prior=False), classifier: post
+score: 0.712707, direction: MultinomialNB(alpha=0.1, class_prior=None, fit_prior=False), classifier: pre
+score: 0.596685, direction: BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: post
+score: 0.588398, direction: BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: pre
+score: 0.589779, direction: BernoulliNB(alpha=2.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: post
+score: 0.578729, direction: BernoulliNB(alpha=2.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: pre
+score: 0.585635, direction: BernoulliNB(alpha=3.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: post
+score: 0.575967, direction: BernoulliNB(alpha=3.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: pre
+score: 0.533149, direction: SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0, degree=3, gamma=0.0,
+  kernel='rbf', max_iter=-1, probability=False, random_state=None,
+  shrinking=True, tol=0.001, verbose=False), classifier: post
+score: 0.533149, direction: SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0, degree=3, gamma=0.0,
+  kernel='rbf', max_iter=-1, probability=False, random_state=None,
+  shrinking=True, tol=0.001, verbose=False), classifier: pre
+score: 0.674033, direction: SVC(C=10000000000.0, cache_size=200, class_weight=None, coef0=0.0, degree=3,
+  gamma=0.0, kernel='rbf', max_iter=-1, probability=False,
+  random_state=None, shrinking=True, tol=0.001, verbose=False), classifier: post
+score: 0.674033, direction: SVC(C=10000000000.0, cache_size=200, class_weight=None, coef0=0.0, degree=3,
+  gamma=0.0, kernel='rbf', max_iter=-1, probability=False,
+  random_state=None, shrinking=True, tol=0.001, verbose=False), classifier: pre

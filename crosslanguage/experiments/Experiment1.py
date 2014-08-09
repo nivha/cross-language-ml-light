@@ -1,4 +1,5 @@
 import os
+from sklearn.svm import SVC
 from learning.SimpleClassifier import create_simple_classifier
 
 os.environ["DJANGO_SETTINGS_MODULE"] = 'crosslanguage.settings'
@@ -9,6 +10,7 @@ from clml.models import Category
 from learning.CrossLanguageClassifier import CrossLanguageClassifier, Direction
 
 __author__ = 'Ori'
+
 
 
 
@@ -30,7 +32,8 @@ class Experiment1(object):
 
         self.classifiers = classifiers
 
-    def run(self):
+    def run(self, output_file=None):
+        output = ''
         for classifier in self.classifiers:
             for direction in [Direction.Post, Direction.Pre]:
                 cross_language_classifier = CrossLanguageClassifier(self.source_language,
@@ -52,22 +55,43 @@ class Experiment1(object):
                 cross_language_classifier.learn(train_articles)
                 score = cross_language_classifier.test(test_articles)
 
-                print 'score: {:f}, direction: {:s}, classifier: {:s}'.format(score, classifier, direction)
+                output += 'score: {:f}, direction: {:s}, classifier: {:s}\n'.format(score, classifier, direction)
+                print '.'
+
+        if output_file is None:
+            print output
+        else:
+            with open(output_file, 'wb') as f:
+                f.write(output)
 
 
-if __name__ == '__main__':
+def run_experiment1(en_cs, es_cs, output_file=None):
     # en_cs = ['Black_holes', 'Dark_matter']
     # es_cs = ['Agujeros_negros', 'Materia_oscura']
 
-    en_cs = ['Epistemology', 'Ethics']
-    es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
+    # en_cs = ['Epistemology', 'Ethics']
+    # es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
 
     classifiers = [
         SGDClassifier(loss='hinge', penalty='l2', alpha=1e-3, n_iter=5),
+        SGDClassifier(),
         MultinomialNB(alpha=1e-3, fit_prior=False),
+        MultinomialNB(alpha=1e-2, fit_prior=False),
+        MultinomialNB(alpha=1e-1, fit_prior=False),
         BernoulliNB(alpha=1.0),
+        BernoulliNB(alpha=2.0),
+        BernoulliNB(alpha=3.0),
+        SVC(),
+        SVC(C=1e10),
+        SVC(C=float('inf')),
     ]
 
     exp = Experiment1('en', 'es', en_cs, es_cs, classifiers)
-    exp.run()
+    exp.run(output_file)
+
+
+if __name__ == '__main__':
+    run_experiment1(['Epistemology', 'Ethics'], ['Epistemolog%C3%ADa', '%C3%89tica'], 'output1.txt')
+    run_experiment1(['Black_holes', 'Dark_matter'], ['Agujeros_negros', 'Materia_oscura'], 'output2.txt')
+
 
