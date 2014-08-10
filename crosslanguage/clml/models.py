@@ -51,7 +51,7 @@ class Article(models.Model):
     # The category of this article
     category = models.ForeignKey(Category)
     # Url from where the article was taken
-    url = models.CharField(max_length=URL_MAX_LEN, unique=True)
+    url = models.CharField(max_length=URL_MAX_LEN)
     # Article title
     title = models.CharField(max_length=NAME_MAX_LEN)
     # The original language in which the article was written (to be distinguished from the translations)
@@ -59,6 +59,10 @@ class Article(models.Model):
 
     # Flag that indicates whether this article is a stub
     is_stub = models.BooleanField()
+
+    class Meta:
+        unique_together = (("category", "title"), ("category", "url"))
+
 
     def get_original_content(self):
         """
