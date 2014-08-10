@@ -1,4 +1,4 @@
-
+# coding=utf-8
 import os
 import urllib
 
@@ -242,8 +242,11 @@ if __name__ == "__main__":
 
     print "HELLO"
 
-    en_cs = ['Epistemology', 'Ethics']
-    es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
+    en_cs = ['Spirituality', 'Religion']
+    es_cs = ['Espiritualidad', urllib.quote('Religión')]
+
+    # en_cs = ['Epistemology', 'Ethics']
+    # es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
 
     # en_cs = ['Asian_art', 'Latin_American_art']
     # es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
@@ -254,5 +257,5 @@ if __name__ == "__main__":
     clf = SimpleClassifier('es', MultinomialNB(alpha=1e-2, fit_prior=False))
     clclf = CrossLanguageClassifier('en', 'es', clf.clf, Direction.Pre)
 
-    # Experiment2Scorer('en', 'es', en_cs, es_cs, [clclf], [clf]).score()
+    Experiment2Scorer('en', 'es', en_cs, es_cs, [clclf], [clf]).score()
     Experiment2Plotter(en_cs, es_cs).plot_scores()

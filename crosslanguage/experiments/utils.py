@@ -32,8 +32,9 @@ class ArticleExtractor(object):
     def extract_translated_articles(self):
         def get_translated(categories):
             articles = Article.objects.filter(category__in=categories)
-            translated_ids = [o.id for o in articles if o.has_translations()]
-            return articles.filter(id__in=translated_ids)
+            # translated_ids = [o.id for o in articles if o.has_translations()]
+            # return articles.filter(id__in=translated_ids)
+            return [o for o in articles if o.has_translations()]
 
         self.source_articles = get_translated(self.source_categories)
         self.target_articles = get_translated(self.target_categories)
