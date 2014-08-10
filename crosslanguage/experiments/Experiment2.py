@@ -68,6 +68,10 @@ class Experiment2Scorer(object):
         for clclf in self.clclfs:
             clclf.category_map = extractor.category_map
 
+        # load last n_units_per_fold if exists (this is if the experiment failed in the middle...)
+        self.last_n_units_per_fold = 1
+        self.last_clf_score = None
+        self.load_last_n_units_per_fold()
 
     def shuffle_articles_if_needed(self):
 
@@ -103,15 +107,45 @@ class Experiment2Scorer(object):
             self.source_articles = [Article.objects.get(id=i) for i in source_ids]
             self.target_articles = [Article.objects.get(id=i) for i in target_ids]
 
+    def load_last_n_units_per_fold(self):
+        # if the score files does not yet exists, no n_units_per_fold should be loaded
+        if not os.path.exists(self.scores_path): return
+
+        # extract last_n_units_per_fold from the scores file
+        with open(self.scores_path) as f:
+            s = f.read().strip()
+            lines = s.split('\n')
+
+            # load last_clf_score if exists..
+            if len(lines) >= self.k_units-1:
+                last_clf_line = lines[self.k_units-1]
+                last_clf_score = last_clf_line.split('\t')[8]
+                last_clf_score = float(last_clf_score)
+                self.last_last_clf_score = last_clf_score
+
+            # load last_n_units_per_fold
+            last_line = lines[-1]
+            n_units_per_fold = last_line.split('\t')[6]
+            n_units_per_fold = int(n_units_per_fold)
+            # we already have the score for n_units_per_fold, so we now want to start from the next one
+            self.last_n_units_per_fold = n_units_per_fold + 1
+            print 'loaded last_n_units_per_fold', n_units_per_fold
+
     def get_articles_from_indices(self, queryset, indices):
         return [queryset[i] for i in indices]
 
+    def add_to_scores_file(self, dst_ds_size, trainset_size, n_units_per_fold, beta, last_clf_score, clclf_score):
+        with open(self.scores_path, 'a') as f:
+            line = '{:s}\t{:s}\t{:s}\t{:s}\t{:d}\t{:d}\t{:d}\t{:.3f}\t{:.3f}\t{:.3f}\n'.format(
+                self.source_categories_names[0], self.source_categories_names[1],
+                self.target_categories_names[0], self.target_categories_names[1],
+                dst_ds_size, trainset_size, n_units_per_fold, beta, last_clf_score, clclf_score)
+            print line
+            f.write(line)
+
     def score_clf(self, clf, fold_generator):
         """
-            Advanced Cros-Validation for our needs for a one-language classifier
-        :param clf:
-        :param fold_generator:
-        :return:
+            Advanced Cross-Validation for our needs for a one-language classifier
         """
 
         scores = []
@@ -124,7 +158,6 @@ class Experiment2Scorer(object):
             scores.append(score)
 
         return np.average(scores)
-
 
     def score_clclf(self, clclf, fold_generator):
         fold_generator.set_custom_ds_size(len(self.source_articles))
@@ -140,47 +173,44 @@ class Experiment2Scorer(object):
 
         return np.average(scores)
 
-    def score_both(self, clclf, clf):
-
-        dst_ds_size = len(self.target_articles)
-        unit_size = dst_ds_size / self.k_units
-        max_units = len(self.source_articles) / unit_size
-
-        beta_scores = []
-        last_clf_score = None
-        for n_units_per_fold in xrange(1, self.k_units):
-
-            fold_generator = FoldGenerator(dst_ds_size, self.k_units, n_units_per_fold)
-            beta = fold_generator.beta()
-            print 'beta:', beta
-
-            clf_score = self.score_clf(clf, fold_generator)
-            last_clf_score = clf_score
-            print clf_score
-
-            clclf_score = self.score_clclf(clclf, fold_generator)
-            self.add_to_scores_file(dst_ds_size, fold_generator.fold_size, beta, last_clf_score, clclf_score)
-
-            #beta_scores.append( ( beta, (clf_score, clclf_score) ) )
-
-        print 'continuing till', max_units
-        for n_units_per_fold in xrange(self.k_units, max_units + 1):
+    def score_both_beta_smaller_than_one(self, clf, clclf, init_n_units_per_fold, dst_ds_size):
+        for n_units_per_fold in xrange(init_n_units_per_fold, self.k_units):
             fold_generator = FoldGenerator(dst_ds_size, self.k_units, n_units_per_fold)
             beta = fold_generator.beta()
             print 'n_units_per_fold', n_units_per_fold, 'beta:', beta
 
+            # compute scores and write them down
+            clf_score = self.score_clf(clf, fold_generator)
             clclf_score = self.score_clclf(clclf, fold_generator)
-            self.add_to_scores_file(dst_ds_size, fold_generator.fold_size, beta, last_clf_score, clclf_score)
+            self.add_to_scores_file(dst_ds_size, fold_generator.fold_size, n_units_per_fold, beta, clf_score, clclf_score)
 
-    def add_to_scores_file(self, dst_ds_size, trainset_size, beta, last_clf_score, clclf_score):
-        with open(self.scores_path, 'a') as f:
-            line = '{:s}\t{:s}\t{:s}\t{:s}\t{:d}\t{:d}\t{:.3f}\t{:.3f}\t{:.3f}\n'.format(
-                self.source_categories_names[0], self.source_categories_names[1],
-                self.target_categories_names[0], self.target_categories_names[1],
-                dst_ds_size, trainset_size, beta, last_clf_score, clclf_score)
-            print line
-            f.write(line)
+        # save last clf score - this is the CVscore of the clf for beta=0.9
+        # namely, the best score we can get for one-language learning..
+        self.last_clf_score = clf_score
+        self.last_n_units_per_fold = self.k_units
 
+    def score_both_beta_larger_than_one(self, clclf, dst_ds_size, max_units):
+        for n_units_per_fold in xrange(self.last_n_units_per_fold, max_units + 1):
+            fold_generator = FoldGenerator(dst_ds_size, self.k_units, n_units_per_fold)
+            beta = fold_generator.beta()
+            print 'n_units_per_fold', n_units_per_fold, 'beta:', beta
+
+            # compute clclf score and write down
+            clclf_score = self.score_clclf(clclf, fold_generator)
+            self.add_to_scores_file(dst_ds_size, fold_generator.fold_size, n_units_per_fold, beta, self.last_clf_score, clclf_score)
+
+    def score_both(self, clclf, clf):
+
+        dst_ds_size = len(self.target_articles)
+
+        if self.last_n_units_per_fold < self.k_units:
+            self.score_both_beta_smaller_than_one(clf, clclf, self.last_n_units_per_fold, dst_ds_size)
+
+        # compute the max_units_per_fold and go on to score clclf
+        unit_size = dst_ds_size / self.k_units
+        max_units = len(self.source_articles) / unit_size
+        print 'continuing till', max_units
+        self.score_both_beta_larger_than_one(clclf, dst_ds_size, max_units)
 
     def score(self):
         for i in xrange(len(self.clclfs)):
@@ -219,7 +249,7 @@ class Experiment2Plotter(object):
             clclf_scores = []
             trainset_sizes = []
             for line in lines:
-                enca, encb, esca, escb, dst_ds_size, trainset_size, beta, clf_score, clclf_score = line.split('\t')
+                enca, encb, esca, escb, dst_ds_size, trainset_size, n_units_per_fold, beta, clf_score, clclf_score = line.split('\t')
                 betas.append(beta)
                 clf_scores.append(clf_score)
                 clclf_scores.append(clclf_score)
@@ -242,8 +272,11 @@ if __name__ == "__main__":
 
     print "HELLO"
 
-    en_cs = ['Spirituality', 'Religion']
-    es_cs = ['Espiritualidad', urllib.quote('Religión')]
+    # en_cs = ['Marxism', 'Marxismo']
+    # es_cs = ['Anarchism', 'Anarquismo']
+
+    # en_cs = ['Spirituality', 'Religion']
+    # es_cs = ['Espiritualidad', urllib.quote('Religión')]
 
     # en_cs = ['Epistemology', 'Ethics']
     # es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
@@ -251,11 +284,11 @@ if __name__ == "__main__":
     # en_cs = ['Asian_art', 'Latin_American_art']
     # es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
 
-    # en_cs = ['Dark_matter', 'Black_holes']
-    # es_cs = ['Materia_oscura', 'Agujeros_negros']
+    en_cs = ['Dark_matter', 'Black_holes']
+    es_cs = ['Materia_oscura', 'Agujeros_negros']
 
-    clf = SimpleClassifier('es', MultinomialNB(alpha=1e-2, fit_prior=False))
-    clclf = CrossLanguageClassifier('en', 'es', clf.clf, Direction.Pre)
+    clf1 = SimpleClassifier('es', MultinomialNB(alpha=1e-2, fit_prior=False))
+    clclf1 = CrossLanguageClassifier('en', 'es', clf1.clf, Direction.Pre)
 
-    Experiment2Scorer('en', 'es', en_cs, es_cs, [clclf], [clf]).score()
-    Experiment2Plotter(en_cs, es_cs).plot_scores()
+    Experiment2Scorer('en', 'es', en_cs, es_cs, [clclf1], [clf1]).score()
+    # Experiment2Plotter(en_cs, es_cs).plot_scores()
