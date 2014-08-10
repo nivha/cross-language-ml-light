@@ -47,7 +47,7 @@ class SimpleClassifier(object):
         predicted = self.clf.predict(test_data)
         result = predicted == test_target
         score = numpy.mean(result)
-        print 'scored:', numpy.sum(result), 'out of:', numpy.size(result)
+        # print 'scored:', numpy.sum(result), 'out of:', numpy.size(result)
         return score
 
 

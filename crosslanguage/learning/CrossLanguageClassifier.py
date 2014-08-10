@@ -5,7 +5,7 @@ from SimpleClassifier import create_simple_classifier
 os.environ["DJANGO_SETTINGS_MODULE"] = 'crosslanguage.settings'
 
 import numpy
-from clml.models import Category
+from clml.models import Category, ArticleContent
 
 __author__ = 'Ori'
 
@@ -39,10 +39,17 @@ class CrossLanguageClassifier(object):
         self.category_map = None
 
     def _get_text(self, article):
-        if self.direction == Direction.Post:
-            return article.articlecontent_set.get(language=self.source_language).text
-        if self.direction == Direction.Pre:
-            return article.articlecontent_set.get(language=self.target_language).text
+        try:
+            if self.direction == Direction.Post:
+                return article.articlecontent_set.get(language=self.source_language).text
+            if self.direction == Direction.Pre:
+                    return article.articlecontent_set.get(language=self.target_language).text
+        except ArticleContent.DoesNotExist:
+            import traceback
+            print traceback.format_exc()
+            print ">>>", article.id
+            print article
+            raise Exception()
 
     def learn(self, source_articles):
         """
@@ -74,7 +81,7 @@ class CrossLanguageClassifier(object):
         :param test_articles: A list of articles to test
         :return:
         """
-        if self.map_categories is None:
+        if self.category_map is None:
             raise LearnerException('Map categories missing')
 
         test_data = [self._get_text(article) for article in test_articles]

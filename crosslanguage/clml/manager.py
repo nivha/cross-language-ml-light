@@ -14,8 +14,8 @@ __author__ = 'Niv & Ori'
 
 def download_cateogries(src_language, dst_language, src_c, dst_c):
 
-    # WikiFetcher(src_language, src_c, 1000, None, 25).fetch_to_files()
-    # WikiFetcher(dst_language, dst_c, 1000, None, 25).fetch_to_files()
+    WikiFetcher(src_language, src_c, 1000, None, 25).fetch_to_files()
+    WikiFetcher(dst_language, dst_c, 400, None, 25).fetch_to_files()
 
     src_c = urllib.quote(src_c)
     dst_c = urllib.quote(dst_c)
@@ -42,5 +42,5 @@ def download_cateogries(src_language, dst_language, src_c, dst_c):
 # [Marxism, Marxismo]
 # [Anarchism, Anarquismo]
 
-download_cateogries('en', 'es', 'Anthropology', 'Antropología')
-download_cateogries('en', 'es', 'Sociology', 'Sociología')
+download_cateogries('en', 'es', 'Religion', 'Religión')
+download_cateogries('en', 'es', 'Spirituality', 'Espiritualidad')

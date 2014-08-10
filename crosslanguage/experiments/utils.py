@@ -2,7 +2,7 @@ import os
 os.environ["DJANGO_SETTINGS_MODULE"] = 'crosslanguage.settings'
 
 
-from clml.models import Category, Article
+from clml.models import Category, Article, ArticleContent
 
 __author__ = 'Mojo'
 
@@ -30,13 +30,13 @@ class ArticleExtractor(object):
         self.target_categories = [Category.objects.get(name=name) for name in self.target_categories_names]
 
     def extract_translated_articles(self):
-        def get_translated(categories_names):
-            articles = Article.objects.filter(category__name__in=categories_names)
+        def get_translated(categories):
+            articles = Article.objects.filter(category__in=categories)
             translated_ids = [o.id for o in articles if o.has_translations()]
             return articles.filter(id__in=translated_ids)
 
-        self.source_articles = get_translated(self.source_categories_names)
-        self.target_articles = get_translated(self.target_categories_names)
+        self.source_articles = get_translated(self.source_categories)
+        self.target_articles = get_translated(self.target_categories)
 
     def map_categories(self):
         """
@@ -53,7 +53,20 @@ if __name__=="__main__":
     en_cs = ['Epistemology', 'Ethics']
     es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
 
-    q = ArticleExtractor(en_cs, es_cs)
-    q.source_articles.count()
+    # q = ArticleExtractor(en_cs, es_cs)
+    #
+    # for a in q.source_articles:
+    #     a.articlecontent_set.get(language='es')
+    #     if a.articlecontent_set.count()!=2:
+    #         print a
+    #
+    # print "AAAAAAAAAAAAAAAA"
+    #
+    # for a in q.target_articles:
+    #     a.articlecontent_set.get(language='es')
+    #     if a.articlecontent_set.count()!=2:
+    #         print a
 
     print 123
+
+    ArticleContent.DoesNotExist
