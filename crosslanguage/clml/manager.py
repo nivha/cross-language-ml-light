@@ -42,5 +42,10 @@ def download_cateogries(src_language, dst_language, src_c, dst_c):
 # [Marxism, Marxismo]
 # [Anarchism, Anarquismo]
 
-download_cateogries('en', 'es', 'Religion', 'Religión')
-download_cateogries('en', 'es', 'Spirituality', 'Espiritualidad')
+# download_cateogries('en', 'es', 'Religion', 'Religión')
+
+load_category('en', 'Spirituality')
+load_category('es', 'Espiritualidad')
+
+load_category('en', 'Religion')
+load_category('es', urllib.quote('Religión'))

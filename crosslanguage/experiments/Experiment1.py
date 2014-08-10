@@ -1,6 +1,10 @@
+# coding=utf-8
 import os
+import urllib
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from experiments.utils import ArticleExtractor
 from learning.SimpleClassifier import create_simple_classifier
 
 os.environ["DJANGO_SETTINGS_MODULE"] = 'crosslanguage.settings'
@@ -28,15 +32,26 @@ class Experiment1(object):
         self.source_language = source_language
         self.target_language = target_language
 
-        self.source_categories = [Category.objects.get(name=name) for name in source_categories_names]
-        self.target_categories = [Category.objects.get(name=name) for name in target_categories_names]
+        self.source_categories_names = source_categories_names
+        self.target_categories_names = target_categories_names
+
+        extractor = ArticleExtractor(self.source_categories_names, self.target_categories_names)
+
+        self.source_categories = list(extractor.source_categories)
+        self.target_categories = list(extractor.target_categories)
+        self.source_articles = list(extractor.source_articles)
+        self.target_articles = list(extractor.target_articles)
 
         self.classifiers = classifiers
 
     def run(self, output_file=None):
+        i = 0
         with open(output_file, 'wb') as f:
 
-            print 'running experiment 1 on categories ', self.source_categories, self.target_categories
+            s = 'running experiment 1 on categories {:s},{:s}\n'.format(self.source_categories, self.target_categories)
+            print s
+            f.write(s)
+
             for classifier in self.classifiers:
                 for direction in [Direction.Post, Direction.Pre]:
                     cross_language_classifier = CrossLanguageClassifier(self.source_language,
@@ -47,18 +62,20 @@ class Experiment1(object):
                     cross_language_classifier.map_categories(self.source_categories, self.target_categories)
 
                     # Get a list of all articles from both categories
-                    train_articles = filter(lambda article: article.has_translations(),
-                                            reduce(lambda a, b: a + b,
-                                                   map(lambda category: list(category.article_set.all()), self.source_categories)))
+                    # train_articles = filter(lambda article: article.has_translations(),
+                    #                         reduce(lambda a, b: a + b,
+                    #                                map(lambda category: list(category.article_set.all()), self.source_categories)))
+                    #
+                    # test_articles = filter(lambda article: article.has_translations(),
+                    #                        reduce(lambda a, b: a + b,
+                    #                               map(lambda category: list(category.article_set.all()), self.target_categories)))
 
-                    test_articles = filter(lambda article: article.has_translations(),
-                                           reduce(lambda a, b: a + b,
-                                                  map(lambda category: list(category.article_set.all()), self.target_categories)))
+                    cross_language_classifier.learn(self.source_articles)
+                    score = cross_language_classifier.test(self.target_articles)
 
-                    cross_language_classifier.learn(train_articles)
-                    score = cross_language_classifier.test(test_articles)
+                    print i
+                    i += 1
 
-                    print '.'
                     f.write('score: {:f}, direction: {:s}, classifier: {:s}\n'.format(score, classifier, direction))
                     f.flush()
 
@@ -85,8 +102,9 @@ def run_experiment1(en_cs, es_cs, output_file=None):
         BernoulliNB(alpha=1.0),
         BernoulliNB(alpha=2.0),
         BernoulliNB(alpha=3.0),
-        SVC(),
+        # SVC(),
         SVC(C=1e10),
+        DecisionTreeClassifier(),
     ]
 
     exp = Experiment1('en', 'es', en_cs, es_cs, classifiers)
@@ -94,7 +112,9 @@ def run_experiment1(en_cs, es_cs, output_file=None):
 
 
 if __name__ == '__main__':
-    run_experiment1(['Epistemology', 'Ethics'], ['Epistemolog%C3%ADa', '%C3%89tica'], 'output1.txt')
-    run_experiment1(['Black_holes', 'Dark_matter'], ['Agujeros_negros', 'Materia_oscura'], 'output2.txt')
+    # run_experiment1(['Epistemology', 'Ethics'], ['Epistemolog%C3%ADa', '%C3%89tica'], 'score_ethics_epistimology.txt')
+    # run_experiment1(['Black_holes', 'Dark_matter'], ['Agujeros_negros', 'Materia_oscura'], 'score_blackholes_darkmatter.txt')
+    # run_experiment1(['Marxism', 'Anarchism'], ['Marxismo', 'Anarquismo'], 'score_marxism_anarchism.txt')
+    run_experiment1(['Spirituality', 'Religion'], ['Espiritualidad', urllib.quote('Religión')], 'score_religion_spirituality.txt')
 
 

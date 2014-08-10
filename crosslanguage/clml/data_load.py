@@ -27,7 +27,7 @@ def load_category(language, category_name):
     print 'Loading category from path:', path
 
     # Create django category in database
-    category = Category.objects.create(
+    category, _ = Category.objects.get_or_create(
         url=category_url,
         name=category_name,
         language=language,
@@ -48,7 +48,7 @@ def load_category(language, category_name):
             article_url = 'http://{:s}.wikipedia.org/wiki/{:s}'.format(
                 language, title)
 
-            article = Article.objects.create(
+            article, _ = Article.objects.get_or_create(
                 category=category,
                 url=article_url,
                 title=title,
@@ -56,7 +56,7 @@ def load_category(language, category_name):
                 is_stub=False  # TODO - check in some way whether this is a stub
             )
 
-            article_content = ArticleContent.objects.get_or_create(
+            article_content, _ = ArticleContent.objects.get_or_create(
                 article=article,
                 language=article.original_language,
                 text=text,
