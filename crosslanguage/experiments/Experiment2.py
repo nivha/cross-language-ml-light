@@ -1,5 +1,7 @@
 
 import os
+import urllib
+
 os.environ["DJANGO_SETTINGS_MODULE"] = 'crosslanguage.settings'
 
 import random
@@ -202,8 +204,8 @@ class Experiment2Plotter(object):
         self.scores_path = os.path.join(RESULTS_DIR, 'experiment2', 'scores_{:s}_{:s}.txt'.format(self.c_a, self.c_b))
         self.figpath = os.path.join(RESULTS_DIR, 'experiment2', 'scores_{:s}_{:s}.png'.format(self.c_a, self.c_b))
 
-        self.c_a_title = self.c_a.replace('_', r'\ ')
-        self.c_b_title = self.c_b.replace('_', r'\ ')
+        self.c_a_title = urllib.unquote(self.c_a.replace('_', r'\ '))
+        self.c_b_title = urllib.unquote(self.c_b.replace('_', r'\ '))
 
     def plot_scores(self):
         import pylab
@@ -240,11 +242,11 @@ if __name__ == "__main__":
 
     print "HELLO"
 
-    # en_cs = ['Epistemology', 'Ethics']
-    # es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
+    en_cs = ['Epistemology', 'Ethics']
+    es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
 
-    en_cs = ['Asian_art', 'Latin_American_art']
-    es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
+    # en_cs = ['Asian_art', 'Latin_American_art']
+    # es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
 
     # en_cs = ['Dark_matter', 'Black_holes']
     # es_cs = ['Materia_oscura', 'Agujeros_negros']
