@@ -12,10 +12,13 @@ from learning.SimpleClassifier import create_simple_classifier, SimpleClassifier
 import numpy as np
 import ujson
 
+from crosslanguage.settings import RESULTS_DIR
+
+
 __author__ = 'Mojo'
 
 
-class Experiment2a(object):
+class Experiment2Scorer(object):
     """
 
     """
@@ -44,6 +47,12 @@ class Experiment2a(object):
         self.clclfs = clclfs
         self.clfs = clfs
 
+        # define paths for scores and shuffled_ids
+        c_a = self.source_categories_names[0]
+        c_b = self.source_categories_names[1]
+        self.shuffled_ids_path = os.path.join('shuffled', 'exp2_shuffled_ids_{:s}_{:s}.txt'.format(c_a, c_b))
+        self.scores_path = os.path.join(RESULTS_DIR, 'experiment2', 'scores_{:s}_{:s}.txt'.format(c_a, c_b))
+
         # extract categories from categories_names
         extractor = ArticleExtractor(self.source_categories_names, self.target_categories_names)
         self.source_articles = list(extractor.source_articles)
@@ -57,7 +66,7 @@ class Experiment2a(object):
         for clclf in self.clclfs:
             clclf.category_map = extractor.category_map
 
-    shuffled_ids_path = 'exp2_shuffled_ids.txt'
+
     def shuffle_articles_if_needed(self):
 
         if os.path.exists(self.shuffled_ids_path):
@@ -148,10 +157,9 @@ class Experiment2a(object):
             print clf_score
 
             clclf_score = self.score_clclf(clclf, fold_generator)
-            print clclf_score
-            with open('scores.txt', 'a') as f:
-                f.write('{:.3f}\t{:.3f}\t{:.3f}\n'.format(beta, clf_score, clclf_score))
-            beta_scores.append( ( beta, (clf_score, clclf_score) ) )
+            self.add_to_scores_file(dst_ds_size, fold_generator.fold_size, beta, last_clf_score, clclf_score)
+
+            #beta_scores.append( ( beta, (clf_score, clclf_score) ) )
 
         print 'continuing till', max_units
         for n_units_per_fold in xrange(self.k_units, max_units + 1):
@@ -160,9 +168,17 @@ class Experiment2a(object):
             print 'n_units_per_fold', n_units_per_fold, 'beta:', beta
 
             clclf_score = self.score_clclf(clclf, fold_generator)
-            print clclf_score
-            with open('scores.txt', 'a') as f:
-                f.write('{:.3f}\t{:.3f}\t{:.3f}\n'.format(beta, last_clf_score, clclf_score))
+            self.add_to_scores_file(dst_ds_size, fold_generator.fold_size, beta, last_clf_score, clclf_score)
+
+    def add_to_scores_file(self, dst_ds_size, trainset_size, beta, last_clf_score, clclf_score):
+        with open(self.scores_path, 'a') as f:
+            line = '{:s}\t{:s}\t{:s}\t{:s}\t{:d}\t{:d}\t{:.3f}\t{:.3f}\t{:.3f}\n'.format(
+                self.source_categories_names[0], self.source_categories_names[1],
+                self.target_categories_names[0], self.target_categories_names[1],
+                dst_ds_size, trainset_size, beta, last_clf_score, clclf_score)
+            print line
+            f.write(line)
+
 
     def score(self):
         for i in xrange(len(self.clclfs)):
@@ -170,31 +186,65 @@ class Experiment2a(object):
             clf = self.clfs[i]
             self.score_both(clclf, clf)
 
-def plot_scores():
-    from pylab import plot, savefig
 
-    with open ('scores.txt') as f:
-        s = f.read().strip()
-        lines = s.split('\n')
+class Experiment2Plotter(object):
 
-        betas = []
-        clf_scores = []
-        clclf_scores = []
-        for line in lines:
-            beta, clf_score, clclf_score = line.split('\t')
-            betas.append(beta)
-            clf_scores.append(clf_score)
-            clclf_scores.append(clclf_score)
+    def __init__(self, source_categories_names, target_categories_names):
 
-        plot(betas, clf_scores)
-        plot(betas, clclf_scores)
-        savefig('scores.png')
+        # self.source_language = source_language
+        # self.target_language = target_language
+        self.source_categories_names = source_categories_names
+        self.target_categories_names = target_categories_names
+
+        self.c_a = self.source_categories_names[0]
+        self.c_b = self.source_categories_names[1]
+        self.shuffled_ids_path = os.path.join('shuffled', 'exp2_shuffled_ids_{:s}_{:s}.txt'.format(self.c_a, self.c_b))
+        self.scores_path = os.path.join(RESULTS_DIR, 'experiment2', 'scores_{:s}_{:s}.txt'.format(self.c_a, self.c_b))
+        self.figpath = os.path.join(RESULTS_DIR, 'experiment2', 'scores_{:s}_{:s}.png'.format(self.c_a, self.c_b))
+
+        self.c_a_title = self.c_a.replace('_', r'\ ')
+        self.c_b_title = self.c_b.replace('_', r'\ ')
+
+    def plot_scores(self):
+        import pylab
+
+        with open(self.scores_path) as f:
+            s = f.read().strip()
+            lines = s.split('\n')
+
+            betas = []
+            clf_scores = []
+            clclf_scores = []
+            trainset_sizes = []
+            for line in lines:
+                enca, encb, esca, escb, dst_ds_size, trainset_size, beta, clf_score, clclf_score = line.split('\t')
+                betas.append(beta)
+                clf_scores.append(clf_score)
+                clclf_scores.append(clclf_score)
+                trainset_sizes.append(trainset_size)
+
+            # pylab.xkcd()
+            pylab.plot(betas, clf_scores, label="$One\ Language\ Spanish\ Classifier$")
+            pylab.plot(betas, clclf_scores, label="$Cross-Language\ Classifier$")
+            pylab.ylabel(r"$CV\ Score$")
+            pylab.xlabel(r"$\beta\ Score$")
+            # title = r"$Comparison\ between\ one-language\ Spanish\ classifier\ (10-fold CV)\ to cross-language\ classifier$"
+            # title += "\n"
+            title = r"$Categories:\ {:s}\ vs.\ {:s}$".format(self.c_a_title, self.c_b_title)
+            pylab.title(title)
+            pylab.legend()
+            pylab.savefig(self.figpath)
 
 
 if __name__ == "__main__":
 
-    en_cs = ['Epistemology', 'Ethics']
-    es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
+    print "HELLO"
+
+    # en_cs = ['Epistemology', 'Ethics']
+    # es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
+
+    en_cs = ['Asian_art', 'Latin_American_art']
+    es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
 
     # en_cs = ['Dark_matter', 'Black_holes']
     # es_cs = ['Materia_oscura', 'Agujeros_negros']
@@ -202,5 +252,5 @@ if __name__ == "__main__":
     clf = SimpleClassifier('es', MultinomialNB(alpha=1e-2, fit_prior=False))
     clclf = CrossLanguageClassifier('en', 'es', clf.clf, Direction.Pre)
 
-    # Experiment2a('en', 'es', en_cs, es_cs, [clclf], [clf]).score()
-    plot_scores()
+    # Experiment2Scorer('en', 'es', en_cs, es_cs, [clclf], [clf]).score()
+    Experiment2Plotter(en_cs, es_cs).plot_scores()
