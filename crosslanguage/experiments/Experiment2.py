@@ -26,6 +26,7 @@ class Experiment2Scorer(object):
     """
     k_units = 10
     max_dst_articles = 200
+    n_samples_above_beta_one = 12
 
     def __init__(self,
                 source_language, target_language,
@@ -71,7 +72,8 @@ class Experiment2Scorer(object):
         # load last n_units_per_fold if exists (this is if the experiment failed in the middle...)
         self.last_n_units_per_fold = 1
         self.last_clf_score = None
-        self.load_last_n_units_per_fold()
+        self.load_parameters_from_results_file()
+
 
     def shuffle_articles_if_needed(self):
 
@@ -103,11 +105,10 @@ class Experiment2Scorer(object):
             source_ids = d['source_ids']
             target_ids = d['target_ids']
 
-
             self.source_articles = [Article.objects.get(id=i) for i in source_ids]
             self.target_articles = [Article.objects.get(id=i) for i in target_ids]
 
-    def load_last_n_units_per_fold(self):
+    def load_parameters_from_results_file(self):
         # if the score files does not yet exists, no n_units_per_fold should be loaded
         if not os.path.exists(self.scores_path): return
 
@@ -116,12 +117,15 @@ class Experiment2Scorer(object):
             s = f.read().strip()
             lines = s.split('\n')
 
-            # load last_clf_score if exists..
+            # if number of lines is greater than self.k_units-1 it means that in the previous run
+            # we got to beta larger than one. so we want to extract a few parameters from the previous score file:
+            #   last_clf_score - this is the score of the clf for beta=0.9. namely, the highest score the
+            #                    clf can get. so we'll be using this one for the rest of the clclf scores for comparison
             if len(lines) >= self.k_units-1:
-                last_clf_line = lines[self.k_units-1]
+                last_clf_line = lines[self.k_units-2]
                 last_clf_score = last_clf_line.split('\t')[8]
                 last_clf_score = float(last_clf_score)
-                self.last_last_clf_score = last_clf_score
+                self.last_clf_score = last_clf_score
 
             # load last_n_units_per_fold
             last_line = lines[-1]
@@ -189,15 +193,28 @@ class Experiment2Scorer(object):
         self.last_clf_score = clf_score
         self.last_n_units_per_fold = self.k_units
 
-    def score_both_beta_larger_than_one(self, clclf, dst_ds_size, max_units):
-        for n_units_per_fold in xrange(self.last_n_units_per_fold, max_units + 1):
-            fold_generator = FoldGenerator(dst_ds_size, self.k_units, n_units_per_fold)
-            beta = fold_generator.beta()
-            print 'n_units_per_fold', n_units_per_fold, 'beta:', beta
+    def score_both_beta_larger_than_one_aux(self, dst_ds_size, n_units_per_fold, clclf):
+        fold_generator = FoldGenerator(dst_ds_size, self.k_units, n_units_per_fold)
+        beta = fold_generator.beta()
+        print 'n_units_per_fold', n_units_per_fold, 'beta:', beta
 
-            # compute clclf score and write down
-            clclf_score = self.score_clclf(clclf, fold_generator)
-            self.add_to_scores_file(dst_ds_size, fold_generator.fold_size, n_units_per_fold, beta, self.last_clf_score, clclf_score)
+        # compute clclf score and write down
+        clclf_score = self.score_clclf(clclf, fold_generator)
+        self.add_to_scores_file(dst_ds_size, fold_generator.fold_size, n_units_per_fold, beta, self.last_clf_score, clclf_score)
+
+    def score_both_beta_larger_than_one(self, clclf, dst_ds_size, max_units):
+
+        # calculate the step between each n_units_per_fold.
+        # we want to do only self.n_samples_above_beta_one from self.k_units to max_units+1
+        step = ((max_units+1) - self.k_units) / self.n_samples_above_beta_one
+        print 'continuing till', max_units, 'step', step
+
+        n_units_per_fold = self.last_n_units_per_fold,
+        for n_units_per_fold in xrange(self.last_n_units_per_fold, max_units + 1, step):
+            self.score_both_beta_larger_than_one_aux(dst_ds_size, n_units_per_fold, clclf)
+        # anyway, score the clclf for all the english samples. namely n_units_per_fold=max_units
+        if n_units_per_fold < max_units:
+            self.score_both_beta_larger_than_one_aux(dst_ds_size, max_units, clclf)
 
     def score_both(self, clclf, clf):
 
@@ -209,7 +226,6 @@ class Experiment2Scorer(object):
         # compute the max_units_per_fold and go on to score clclf
         unit_size = dst_ds_size / self.k_units
         max_units = len(self.source_articles) / unit_size
-        print 'continuing till', max_units
         self.score_both_beta_larger_than_one(clclf, dst_ds_size, max_units)
 
     def score(self):
