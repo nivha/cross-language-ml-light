@@ -288,11 +288,11 @@ if __name__ == "__main__":
 
     print "HELLO"
 
-    # en_cs = ['Marxism', 'Marxismo']
-    # es_cs = ['Anarchism', 'Anarquismo']
+    # en_cs = ['Marxism', 'Anarchism']
+    # es_cs = ['Marxismo', 'Anarquismo']
 
-    # en_cs = ['Spirituality', 'Religion']
-    # es_cs = ['Espiritualidad', urllib.quote('Religión')]
+    en_cs = ['Spirituality', 'Religion']
+    es_cs = ['Espiritualidad', urllib.quote('Religión')]
 
     # en_cs = ['Epistemology', 'Ethics']
     # es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
@@ -300,11 +300,11 @@ if __name__ == "__main__":
     # en_cs = ['Asian_art', 'Latin_American_art']
     # es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
 
-    en_cs = ['Dark_matter', 'Black_holes']
-    es_cs = ['Materia_oscura', 'Agujeros_negros']
+    # en_cs = ['Dark_matter', 'Black_holes']
+    # es_cs = ['Materia_oscura', 'Agujeros_negros']
 
     clf1 = SimpleClassifier('es', MultinomialNB(alpha=1e-2, fit_prior=False))
     clclf1 = CrossLanguageClassifier('en', 'es', clf1.clf, Direction.Pre)
 
     Experiment2Scorer('en', 'es', en_cs, es_cs, [clclf1], [clf1]).score()
-    # Experiment2Plotter(en_cs, es_cs).plot_scores()
+    Experiment2Plotter(en_cs, es_cs).plot_scores()

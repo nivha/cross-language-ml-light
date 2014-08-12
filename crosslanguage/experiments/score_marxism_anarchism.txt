@@ -1,0 +1,69 @@
+running experiment 1 on categories [<Category: en: Marxism>, <Category: en: Anarchism>],[<Category: es: Marxismo>, <Category: es: Anarquismo>]
+score: 0.725389, direction: SGDClassifier(alpha=0.001, class_weight=None, epsilon=0.1, eta0=0.0,
+       fit_intercept=True, l1_ratio=0.15, learning_rate='optimal',
+       loss='hinge', n_iter=5, n_jobs=1, penalty='l2', power_t=0.5,
+       random_state=None, shuffle=False, verbose=0, warm_start=False), classifier: post
+score: 0.498705, direction: SGDClassifier(alpha=0.001, class_weight=None, epsilon=0.1, eta0=0.0,
+       fit_intercept=True, l1_ratio=0.15, learning_rate='optimal',
+       loss='hinge', n_iter=5, n_jobs=1, penalty='l2', power_t=0.5,
+       random_state=None, shuffle=False, verbose=0, warm_start=False), classifier: pre
+score: 0.642487, direction: SGDClassifier(alpha=0.0001, class_weight=None, epsilon=0.1, eta0=0.0,
+       fit_intercept=True, l1_ratio=0.15, learning_rate='optimal',
+       loss='hinge', n_iter=5, n_jobs=1, penalty='l2', power_t=0.5,
+       random_state=None, shuffle=False, verbose=0, warm_start=False), classifier: post
+score: 0.500000, direction: SGDClassifier(alpha=0.0001, class_weight=None, epsilon=0.1, eta0=0.0,
+       fit_intercept=True, l1_ratio=0.15, learning_rate='optimal',
+       loss='hinge', n_iter=5, n_jobs=1, penalty='l2', power_t=0.5,
+       random_state=None, shuffle=False, verbose=0, warm_start=False), classifier: pre
+score: 0.520725, direction: MultinomialNB(alpha=0, class_prior=None, fit_prior=False), classifier: post
+score: 0.510363, direction: MultinomialNB(alpha=0, class_prior=None, fit_prior=False), classifier: pre
+score: 0.867876, direction: MultinomialNB(alpha=0.001, class_prior=None, fit_prior=False), classifier: post
+score: 0.863990, direction: MultinomialNB(alpha=0.001, class_prior=None, fit_prior=False), classifier: pre
+score: 0.889896, direction: MultinomialNB(alpha=0.01, class_prior=None, fit_prior=False), classifier: post
+score: 0.876943, direction: MultinomialNB(alpha=0.01, class_prior=None, fit_prior=False), classifier: pre
+score: 0.891192, direction: MultinomialNB(alpha=0.1, class_prior=None, fit_prior=False), classifier: post
+score: 0.896373, direction: MultinomialNB(alpha=0.1, class_prior=None, fit_prior=False), classifier: pre
+score: 0.906736, direction: MultinomialNB(alpha=1, class_prior=None, fit_prior=False), classifier: post
+score: 0.888601, direction: MultinomialNB(alpha=1, class_prior=None, fit_prior=False), classifier: pre
+score: 0.514249, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=1, p=2, weights='uniform'), classifier: post
+score: 0.532383, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=1, p=2, weights='uniform'), classifier: pre
+score: 0.512953, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=3, p=2, weights='uniform'), classifier: post
+score: 0.571244, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=3, p=2, weights='uniform'), classifier: pre
+score: 0.498705, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=5, p=2, weights='uniform'), classifier: post
+score: 0.536269, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=5, p=2, weights='uniform'), classifier: pre
+score: 0.514249, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=1, p=2, weights='distance'), classifier: post
+score: 0.532383, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=1, p=2, weights='distance'), classifier: pre
+score: 0.512953, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=3, p=2, weights='distance'), classifier: post
+score: 0.571244, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=3, p=2, weights='distance'), classifier: pre
+score: 0.498705, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=5, p=2, weights='distance'), classifier: post
+score: 0.536269, direction: KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           n_neighbors=5, p=2, weights='distance'), classifier: pre
+score: 0.752591, direction: BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: post
+score: 0.721503, direction: BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: pre
+score: 0.738342, direction: BernoulliNB(alpha=2.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: post
+score: 0.709845, direction: BernoulliNB(alpha=2.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: pre
+score: 0.725389, direction: BernoulliNB(alpha=3.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: post
+score: 0.705959, direction: BernoulliNB(alpha=3.0, binarize=0.0, class_prior=None, fit_prior=True), classifier: pre
+score: 0.501295, direction: SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0, degree=3, gamma=0.0,
+  kernel='rbf', max_iter=-1, probability=False, random_state=None,
+  shrinking=True, tol=0.001, verbose=False), classifier: post
+score: 0.501295, direction: SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0, degree=3, gamma=0.0,
+  kernel='rbf', max_iter=-1, probability=False, random_state=None,
+  shrinking=True, tol=0.001, verbose=False), classifier: pre
+score: 0.857513, direction: SVC(C=10000000000.0, cache_size=200, class_weight=None, coef0=0.0, degree=3,
+  gamma=0.0, kernel='rbf', max_iter=-1, probability=False,
+  random_state=None, shrinking=True, tol=0.001, verbose=False), classifier: post
+score: 0.860104, direction: SVC(C=10000000000.0, cache_size=200, class_weight=None, coef0=0.0, degree=3,
+  gamma=0.0, kernel='rbf', max_iter=-1, probability=False,
+  random_state=None, shrinking=True, tol=0.001, verbose=False), classifier: pre

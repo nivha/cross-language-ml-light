@@ -93,16 +93,17 @@ def run_experiment1(en_cs, es_cs, output_file=None):
         MultinomialNB(alpha=1e-3, fit_prior=False),
         MultinomialNB(alpha=1e-2, fit_prior=False),
         MultinomialNB(alpha=1e-1, fit_prior=False),
-        # KNeighborsClassifier(1, weights='uniform'),
-        # KNeighborsClassifier(3, weights='uniform'),
-        # KNeighborsClassifier(5, weights='uniform'),
-        # KNeighborsClassifier(1, weights='distance'),
-        # KNeighborsClassifier(3, weights='distance'),
-        # KNeighborsClassifier(5, weights='distance'),
-        # BernoulliNB(alpha=1.0),
-        # BernoulliNB(alpha=2.0),
-        # BernoulliNB(alpha=3.0),
-        # SVC(),
+        MultinomialNB(alpha=1, fit_prior=False),
+        KNeighborsClassifier(1, weights='uniform'),
+        KNeighborsClassifier(3, weights='uniform'),
+        KNeighborsClassifier(5, weights='uniform'),
+        KNeighborsClassifier(1, weights='distance'),
+        KNeighborsClassifier(3, weights='distance'),
+        KNeighborsClassifier(5, weights='distance'),
+        BernoulliNB(alpha=1.0),
+        BernoulliNB(alpha=2.0),
+        BernoulliNB(alpha=3.0),
+        SVC(),
         SVC(C=1e10),
         # DecisionTreeClassifier(),
     ]
@@ -114,8 +115,8 @@ def run_experiment1(en_cs, es_cs, output_file=None):
 if __name__ == '__main__':
     # run_experiment1(['Epistemology', 'Ethics'], ['Epistemolog%C3%ADa', '%C3%89tica'], 'score_ethics_epistimology.txt')
     # run_experiment1(['Black_holes', 'Dark_matter'], ['Agujeros_negros', 'Materia_oscura'], 'score_blackholes_darkmatter.txt')
-    # run_experiment1(['Marxism', 'Anarchism'], ['Marxismo', 'Anarquismo'], 'score_marxism_anarchism.txt')
-    run_experiment1(['Spirituality', 'Religion'], ['Espiritualidad', urllib.quote('Religión')], 'score_religion_spirituality.txt')
+    run_experiment1(['Marxism', 'Anarchism'], ['Marxismo', 'Anarquismo'], 'score_marxism_anarchism.txt')
+    # run_experiment1(['Spirituality', 'Religion'], ['Espiritualidad', urllib.quote('Religión')], 'score_religion_spirituality.txt')
 
     # TODO: automatic output file name and path
 

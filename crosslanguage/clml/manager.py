@@ -39,14 +39,18 @@ def download_cateogries(src_language, dst_language, src_c, dst_c):
 # [Religion, Religión]
 # [Spirituality, Espiritualidad]
 
-# [Marxism, Marxismo]
-# [Anarchism, Anarquismo]
+# [Climate, Clima]
+# [Hydrology, Hidrología]
+
+# en_cs = [Marxism, Marxismo]
+# es_cs = [Anarchism, Anarquismo]
 
 # download_cateogries('en', 'es', 'Religion', 'Religión')
 
-load_category('en', 'Spirituality')
-load_category('es', 'Espiritualidad')
+en_cs = ['Dark_matter', 'Black_holes']
+es_cs = ['Materia_oscura', 'Agujeros_negros']
 
-# load_category('en', 'Religion')
-# load_category('es', urllib.quote('Religión'))
-
+for c in en_cs:
+    load_category('en', c)
+for c in es_cs:
+    load_category('es', urllib.quote(c))

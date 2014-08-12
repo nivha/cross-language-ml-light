@@ -86,11 +86,9 @@ def load_category(language, category_name):
 
                 # TODO: I delete here articles that appear twice (meaning that they appear in more than
                 # TODO:   one category). This should be done somewhere else before..
-                articles = Article.objects.filter(original_language=language, title=os.path.splitext(filename)[0])
-                if len(articles) != 1:
-                    articles.delete()
-                    continue
-                article = articles[0]
+                article = Article.objects.get(original_language=language,
+                                               category__name=category_name,
+                                               title=os.path.splitext(filename)[0])
 
                 print 'adding ' + lang_dir + ' translation to ' + article.title + ' , originally in ' + language
                 article_content = ArticleContent.objects.get_or_create(
