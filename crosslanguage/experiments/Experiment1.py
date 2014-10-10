@@ -35,12 +35,12 @@ class Experiment1(object):
         self.source_categories_names = source_categories_names
         self.target_categories_names = target_categories_names
 
-        extractor = ArticleExtractor(self.source_categories_names, self.target_categories_names)
+        self.extractor = ArticleExtractor(self.source_categories_names, self.target_categories_names)
 
-        self.source_categories = list(extractor.source_categories)
-        self.target_categories = list(extractor.target_categories)
-        self.source_articles = list(extractor.source_articles)
-        self.target_articles = list(extractor.target_articles)
+        self.source_categories = list(self.extractor.source_categories)
+        self.target_categories = list(self.extractor.target_categories)
+        self.source_articles = list(self.extractor.source_articles)
+        self.target_articles = list(self.extractor.target_articles)
 
         self.classifiers = classifiers
 
@@ -50,6 +50,19 @@ class Experiment1(object):
             s = 'running experiment 1 on categories {:s},{:s}\n'.format(self.source_categories, self.target_categories)
             print s
             f.write(s)
+
+            # compute statistics on categories
+            source_language = [article.category.name for article in self.source_articles]
+            target_language = [article.category.name for article in self.target_articles]
+            for c in self.source_categories_names:
+                s = '{:s}: {:d}'.format(c, source_language.count(c))
+                print s
+                f.write(s)
+            for c in self.target_categories_names:
+                s = '{:s}: {:d}'.format(c, target_language.count(c))
+                print s
+                f.write(s)
+
 
             for classifier in self.classifiers:
                 for direction in [Direction.Post, Direction.Pre]:
@@ -75,7 +88,7 @@ class Experiment1(object):
                     print i
                     i += 1
 
-                    f.write('score: {:f}, direction: {:s}, classifier: {:s}\n'.format(score, classifier, direction))
+                    f.write('{:f}\t{:s}\t{:s}\n'.format(score, classifier, direction))
                     f.flush()
 
 
