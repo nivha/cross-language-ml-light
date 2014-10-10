@@ -47,7 +47,6 @@ class Experiment1(object):
     def run(self, output_file=None):
         i = 0
         with open(output_file, 'wb') as f:
-
             s = 'running experiment 1 on categories {:s},{:s}\n'.format(self.source_categories, self.target_categories)
             print s
             f.write(s)
@@ -105,7 +104,7 @@ def run_experiment1(en_cs, es_cs, output_file=None):
         BernoulliNB(alpha=3.0),
         SVC(),
         SVC(C=1e10),
-        # DecisionTreeClassifier(),
+        DecisionTreeClassifier(),
     ]
 
     exp = Experiment1('en', 'es', en_cs, es_cs, classifiers)
@@ -115,8 +114,9 @@ def run_experiment1(en_cs, es_cs, output_file=None):
 if __name__ == '__main__':
     # run_experiment1(['Epistemology', 'Ethics'], ['Epistemolog%C3%ADa', '%C3%89tica'], 'score_ethics_epistimology.txt')
     # run_experiment1(['Black_holes', 'Dark_matter'], ['Agujeros_negros', 'Materia_oscura'], 'score_blackholes_darkmatter.txt')
-    run_experiment1(['Marxism', 'Anarchism'], ['Marxismo', 'Anarquismo'], 'score_marxism_anarchism.txt')
+    # run_experiment1(['Marxism', 'Anarchism'], ['Marxismo', 'Anarquismo'], 'score_marxism_anarchism.txt')
     # run_experiment1(['Spirituality', 'Religion'], ['Espiritualidad', urllib.quote('Religión')], 'score_religion_spirituality.txt')
+    run_experiment1(['Latin_American_art', 'Asian_art'], ['Arte_latinoamericano', urllib.quote('Arte_de_Asia')], 'score_asian_american_art.txt')
 
     # TODO: automatic output file name and path
 

@@ -74,7 +74,6 @@ class Experiment2Scorer(object):
         self.last_clf_score = None
         self.load_parameters_from_results_file()
 
-
     def shuffle_articles_if_needed(self):
 
         if os.path.exists(self.shuffled_ids_path):

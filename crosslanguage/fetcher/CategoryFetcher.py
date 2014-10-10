@@ -8,6 +8,7 @@ from wikitools import wiki
 from wikitools import category
 from fetcher.utils import cat_lang
 
+
 class CategoryFetcher(object):
     """
         :params
@@ -119,15 +120,15 @@ class CategoryFetcher(object):
 
 
 ######## English
-# cf = CategoryFetcher('en')
-# articles = cf.get_category_recursively("Category:Institute_of_Physics")
-# for article in articles:
-#    print article
+cf = CategoryFetcher('en')
+articles = cf.get_category_recursively("Category:Institute_of_Physics")
+for article in articles:
+   print article
 
-######## Spanish
-# cf = CategoryFetcher('es')
-# articles = cf.get_category_recursively('Categoría:Libros_de_ciencias_de_la_computación')
-# for article in articles:
-#    print article
+####### Spanish
+cf = CategoryFetcher('es')
+articles = cf.get_category_recursively('Categoría:Libros_de_ciencias_de_la_computación')
+for article in articles:
+   print article
 
-#articles = get_category_recursively(site, "Categoría:Libros_de_física")
+# articles = get_category_recursively(site, "Categoría:Libros_de_física")

@@ -15,7 +15,7 @@ __author__ = 'Ori'
 
 def create_simple_classifier(classifier_type):
     return Pipeline([('vect', CountVectorizer(stop_words='english')),
-                     ('tfidf', TfidfTransformer()),
+                     ('tfidf', TfidfTransformer(use_idf=True)),
                      ('clf', classifier_type),
                      ])
 

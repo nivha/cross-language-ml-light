@@ -22,22 +22,46 @@ class ArticleExtractor(object):
 
         # Run extraction functions
         self.extract_categories_from_names()
-        self.extract_translated_articles()
+        self.extract_relevant_articles()
         self.map_categories()
 
     def extract_categories_from_names(self):
         self.source_categories = [Category.objects.get(name=name) for name in self.source_categories_names]
         self.target_categories = [Category.objects.get(name=name) for name in self.target_categories_names]
 
-    def extract_translated_articles(self):
-        def get_translated(categories):
-            articles = Article.objects.filter(category__in=categories)
-            # translated_ids = [o.id for o in articles if o.has_translations()]
-            # return articles.filter(id__in=translated_ids)
-            return [o for o in articles if o.has_translations()]
+    def extract_relevant_articles(self):
+        """
+        Retrives only articles which:
+        1. Have translation
+        2. Do not intersect between the two categories
+        """
 
-        self.source_articles = get_translated(self.source_categories)
-        self.target_articles = get_translated(self.target_categories)
+        def get_translated(article_set):
+            return [o for o in article_set if o.has_translations()]
+
+        def get_non_intersecting_articles(categories):
+            """ clean articles in the intersection """
+            c1_articles = Article.objects.filter(category=categories[0])
+            c2_articles = Article.objects.filter(category=categories[1])
+
+            c1_urls = set([o.url for o in c1_articles])
+            c2_urls = set([o.url for o in c2_articles])
+            intersecting_urls = c1_urls.intersection(c2_urls)
+            # remove articles from intersection
+            intersecting_ids = []
+            for url in intersecting_urls:
+                ass = Article.objects.filter(category__in=categories, url=url)
+                intersecting_ids.extend([o.id for o in ass])
+
+            return Article.objects.filter(category__in=categories).exclude(id__in=intersecting_ids)
+
+        # remove articles in intersection
+        self.source_articles = get_non_intersecting_articles(self.source_categories)
+        self.target_articles = get_non_intersecting_articles(self.target_categories)
+
+        # get only translated
+        self.source_articles = get_translated(self.source_articles)
+        self.target_articles = get_translated(self.target_articles)
 
     def map_categories(self):
         """
@@ -49,12 +73,11 @@ class ArticleExtractor(object):
         self.category_map = dict(zip(target_categories_names, source_categories_names))
 
 
-
-if __name__=="__main__":
+if __name__ == "__main__":
     en_cs = ['Epistemology', 'Ethics']
     es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
 
-    # q = ArticleExtractor(en_cs, es_cs)
+    q = ArticleExtractor(en_cs, es_cs)
     #
     # for a in q.source_articles:
     #     a.articlecontent_set.get(language='es')
@@ -67,7 +90,3 @@ if __name__=="__main__":
     #     a.articlecontent_set.get(language='es')
     #     if a.articlecontent_set.count()!=2:
     #         print a
-
-    print 123
-
-    ArticleContent.DoesNotExist
