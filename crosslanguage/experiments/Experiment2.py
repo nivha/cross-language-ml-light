@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import urllib
+from sklearn.svm import SVC
 
 os.environ["DJANGO_SETTINGS_MODULE"] = 'crosslanguage.settings'
 
@@ -245,7 +246,7 @@ class Experiment2Plotter(object):
 
         self.c_a = self.source_categories_names[0]
         self.c_b = self.source_categories_names[1]
-        self.shuffled_ids_path = os.path.join('shuffled', 'exp2_shuffled_ids_{:s}_{:s}.txt'.format(self.c_a, self.c_b))
+        # self.shuffled_ids_path = os.path.join('shuffled', 'exp2_shuffled_ids_{:s}_{:s}.txt'.format(self.c_a, self.c_b))
         self.scores_path = os.path.join(RESULTS_DIR, 'experiment2', 'scores_{:s}_{:s}.txt'.format(self.c_a, self.c_b))
         self.figpath = os.path.join(RESULTS_DIR, 'experiment2', 'scores_{:s}_{:s}.png'.format(self.c_a, self.c_b))
 
@@ -279,7 +280,7 @@ class Experiment2Plotter(object):
             # title += "\n"
             title = r"$Categories:\ {:s}\ vs.\ {:s}$".format(self.c_a_title, self.c_b_title)
             pylab.title(title)
-            pylab.legend()
+            pylab.legend(loc=4)
             pylab.savefig(self.figpath)
 
 
@@ -290,20 +291,26 @@ if __name__ == "__main__":
     # en_cs = ['Marxism', 'Anarchism']
     # es_cs = ['Marxismo', 'Anarquismo']
 
-    en_cs = ['Spirituality', 'Religion']
-    es_cs = ['Espiritualidad', urllib.quote('Religión')]
-
     # en_cs = ['Epistemology', 'Ethics']
     # es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
+    #
+    en_cs = ['Asian_art', 'Latin_American_art']
+    es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
+    #
+    # en_cs = ['Spirituality', 'Religion']
+    # es_cs = ['Espiritualidad', urllib.quote('Religión')]
 
-    # en_cs = ['Asian_art', 'Latin_American_art']
-    # es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
+    # en_cs = ['Islamic_architecture', 'Modernist_architecture']
+    # es_cs = [urllib.quote('Arquitectura_islámica'), 'Arquitectura_moderna']
 
     # en_cs = ['Dark_matter', 'Black_holes']
     # es_cs = ['Materia_oscura', 'Agujeros_negros']
 
-    clf1 = SimpleClassifier('es', MultinomialNB(alpha=1e-2, fit_prior=False))
-    clclf1 = CrossLanguageClassifier('en', 'es', clf1.clf, Direction.Pre)
+
+
+    # clf1 = SimpleClassifier('es', MultinomialNB(alpha=0.01, fit_prior=False))
+    clf1 = SimpleClassifier('es', SVC(C=1e10))
+    clclf1 = CrossLanguageClassifier('en', 'es', clf1.clf, Direction.Post)
 
     Experiment2Scorer('en', 'es', en_cs, es_cs, [clclf1], [clf1]).score()
     Experiment2Plotter(en_cs, es_cs).plot_scores()
