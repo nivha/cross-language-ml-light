@@ -1,7 +1,7 @@
 # coding=utf-8
 import os
 import urllib
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
 
 os.environ["DJANGO_SETTINGS_MODULE"] = 'crosslanguage.settings'
 
@@ -249,6 +249,7 @@ class Experiment2Plotter(object):
         # self.shuffled_ids_path = os.path.join('shuffled', 'exp2_shuffled_ids_{:s}_{:s}.txt'.format(self.c_a, self.c_b))
         self.scores_path = os.path.join(RESULTS_DIR, 'experiment2', 'scores_{:s}_{:s}.txt'.format(self.c_a, self.c_b))
         self.figpath = os.path.join(RESULTS_DIR, 'experiment2', 'scores_{:s}_{:s}.png'.format(self.c_a, self.c_b))
+        self.rbetas_figpath = os.path.join(RESULTS_DIR, 'experiment2', 'scores_{:s}_{:s}_rbetas.png'.format(self.c_a, self.c_b))
 
         self.c_a_title = urllib.unquote(self.c_a.replace('_', r'\ '))
         self.c_b_title = urllib.unquote(self.c_b.replace('_', r'\ '))
@@ -256,14 +257,15 @@ class Experiment2Plotter(object):
     def plot_scores(self):
         import pylab
 
+
+        betas = []
+        clf_scores = []
+        clclf_scores = []
+        trainset_sizes = []
+        # extract necessary data from scores file
         with open(self.scores_path) as f:
             s = f.read().strip()
             lines = s.split('\n')
-
-            betas = []
-            clf_scores = []
-            clclf_scores = []
-            trainset_sizes = []
             for line in lines:
                 enca, encb, esca, escb, dst_ds_size, trainset_size, n_units_per_fold, beta, clf_score, clclf_score = line.split('\t')
                 betas.append(beta)
@@ -271,17 +273,85 @@ class Experiment2Plotter(object):
                 clclf_scores.append(clclf_score)
                 trainset_sizes.append(trainset_size)
 
-            # pylab.xkcd()
-            pylab.plot(betas, clf_scores, label="$One\ Language\ Spanish\ Classifier$")
-            pylab.plot(betas, clclf_scores, label="$Cross-Language\ Classifier$")
-            pylab.ylabel(r"$CV\ Score$")
-            pylab.xlabel(r"$\beta\ Score$")
-            # title = r"$Comparison\ between\ one-language\ Spanish\ classifier\ (10-fold CV)\ to cross-language\ classifier$"
-            # title += "\n"
-            title = r"$Categories:\ {:s}\ vs.\ {:s}$".format(self.c_a_title, self.c_b_title)
-            pylab.title(title)
-            pylab.legend(loc=4)
-            pylab.savefig(self.figpath)
+        # pylab.xkcd()
+        pylab.plot(betas, clf_scores, label="$One\ Language\ Spanish\ Classifier$")
+        pylab.plot(betas, clclf_scores, label="$Cross-Language\ Classifier$")
+        pylab.ylabel(r"$CV\ Score$")
+        pylab.xlabel(r"$\beta\ Score$")
+        # title = r"$Comparison\ between\ one-language\ Spanish\ classifier\ (10-fold CV)\ to cross-language\ classifier$"
+        # title += "\n"
+        title = r"$Categories:\ {:s}\ vs.\ {:s}$".format(self.c_a_title, self.c_b_title)
+        pylab.title(title)
+        pylab.legend(loc=4)
+        pylab.savefig(self.figpath)
+
+    def plot_required_beta_graph(self):
+        """
+        Plots thr graph which is the required coefficient to make the ALR similar to ALBSH
+        """
+
+        def get_rbeta_for_clf_score(clf_score, clclf_scores, betas):
+            """
+            Compute the rbeta for clf_score
+            for a given score, look for the same clclf_score if exists, otherwise interpolate linearly
+            from the nearest two points, and return its beta.
+            """
+            # can be changed to binary search.. not really necessary for this amount of data
+            rbeta = None
+            for i, clclf_score in enumerate(clclf_scores):
+                # found an exact match for clclf
+                if clclf_score == clf_score:
+                    rbeta = betas[i]
+                    break
+                # didn't find - interpolate!
+                if clclf_score >= clf_score:
+                    y0 = clclf_scores[i-1]
+                    x0 = betas[i-1]
+                    y1 = clclf_score
+                    x1 = betas[i]
+                    rbeta = (clf_score - y0) * ((x1 - x0) / (y1 - y0)) + x0
+                    break
+            # if rbeta=None: it means we couldn't find a higher clclf_score,
+            # which means there's no relevant rbeta in this experiment..
+            return rbeta
+
+        print "plotting required beta graph.."
+        import pylab
+        betas = []
+        clf_scores = []
+        clclf_scores = []
+        trainset_sizes = []
+        # extract necessary data from scores file
+        with open(self.scores_path) as f:
+            s = f.read().strip()
+            lines = s.split('\n')
+            for line in lines:
+                enca, encb, esca, escb, dst_ds_size, trainset_size, n_units_per_fold, beta, clf_score, clclf_score = line.split('\t')
+                betas.append(float(beta))
+                clf_scores.append(float(clf_score))
+                clclf_scores.append(float(clclf_score))
+                trainset_sizes.append(int(trainset_size))
+
+        # compute the necessary data
+        betas_ratios = []
+        for i, clf_score in enumerate(clf_scores):
+            if i >= 9: break
+            rbeta = get_rbeta_for_clf_score(clf_score, clclf_scores, betas)
+            if rbeta is None: break
+            print trainset_sizes[i], i, clf_score, rbeta, rbeta / betas[i]
+            betas_ratios.append(rbeta / betas[i])
+
+        pylab.plot(trainset_sizes[:len(betas_ratios)], betas_ratios, label="$bla\ bla$")
+        pylab.ylabel(r"$\beta s\ ratio$")
+        pylab.xlabel(r"$Trainset\ size$")
+        # title = r"$Comparison\ between\ one-language\ Spanish\ classifier\ (10-fold CV)\ to cross-language\ classifier$"
+        # title += "\n"
+        title = r"$Categories:\ {:s}\ vs.\ {:s}$".format(self.c_a_title, self.c_b_title)
+        pylab.title(title)
+        pylab.legend(loc=4)
+        pylab.savefig(self.rbetas_figpath)
+
+
 
 
 if __name__ == "__main__":
@@ -294,23 +364,25 @@ if __name__ == "__main__":
     # en_cs = ['Epistemology', 'Ethics']
     # es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
     #
-    en_cs = ['Asian_art', 'Latin_American_art']
-    es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
+    # en_cs = ['Asian_art', 'Latin_American_art']
+    # es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
     #
     # en_cs = ['Spirituality', 'Religion']
     # es_cs = ['Espiritualidad', urllib.quote('Religión')]
 
-    # en_cs = ['Islamic_architecture', 'Modernist_architecture']
-    # es_cs = [urllib.quote('Arquitectura_islámica'), 'Arquitectura_moderna']
+    en_cs = ['Islamic_architecture', 'Modernist_architecture']
+    es_cs = [urllib.quote('Arquitectura_islámica'), 'Arquitectura_moderna']
 
     # en_cs = ['Dark_matter', 'Black_holes']
     # es_cs = ['Materia_oscura', 'Agujeros_negros']
 
 
+    print "Working on:", en_cs, es_cs
 
     # clf1 = SimpleClassifier('es', MultinomialNB(alpha=0.01, fit_prior=False))
-    clf1 = SimpleClassifier('es', SVC(C=1e10))
-    clclf1 = CrossLanguageClassifier('en', 'es', clf1.clf, Direction.Post)
-
-    Experiment2Scorer('en', 'es', en_cs, es_cs, [clclf1], [clf1]).score()
-    Experiment2Plotter(en_cs, es_cs).plot_scores()
+    # clf1 = SimpleClassifier('es', LinearSVC(C=1e10))
+    # clclf1 = CrossLanguageClassifier('en', 'es', clf1.clf, Direction.Post)
+    #
+    # Experiment2Scorer('en', 'es', en_cs, es_cs, [clclf1], [clf1]).score()
+    # Experiment2Plotter(en_cs, es_cs).plot_scores()
+    Experiment2Plotter(en_cs, es_cs).plot_required_beta_graph()
