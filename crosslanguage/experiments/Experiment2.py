@@ -237,7 +237,9 @@ class Experiment2Scorer(object):
 
 class Experiment2Plotter(object):
 
-    def __init__(self, source_categories_names, target_categories_names):
+    def __init__(self, source_categories_names, target_categories_names, clf_name):
+
+        self.clf_name = clf_name
 
         # self.source_language = source_language
         # self.target_language = target_language
@@ -256,7 +258,7 @@ class Experiment2Plotter(object):
 
     def plot_scores(self):
         import pylab
-
+        pylab.clf()
 
         betas = []
         clf_scores = []
@@ -274,49 +276,128 @@ class Experiment2Plotter(object):
                 trainset_sizes.append(trainset_size)
 
         # pylab.xkcd()
-        pylab.plot(betas, clf_scores, label="$One\ Language\ Spanish\ Classifier$")
-        pylab.plot(betas, clclf_scores, label="$Cross-Language\ Classifier$")
+
+        pylab.plot(trainset_sizes[:9], clf_scores[:9], 'b-', label="$One\ Language\ Spanish\ Classifier$")
+        pylab.plot(trainset_sizes[9:], clf_scores[9:], 'b--')
+        pylab.plot(trainset_sizes, clclf_scores, 'g-', label="$Cross-Language\ Classifier$")
         pylab.ylabel(r"$CV\ Score$")
-        pylab.xlabel(r"$\beta\ Score$")
-        # title = r"$Comparison\ between\ one-language\ Spanish\ classifier\ (10-fold CV)\ to cross-language\ classifier$"
-        # title += "\n"
+        pylab.xlabel(r"$Training\ set\ size$")
+        #pylab.ylim([0.5,1])
         title = r"$Categories:\ {:s}\ vs.\ {:s}$".format(self.c_a_title, self.c_b_title)
+        title += "\n"
+        title += r"$Algorithm:\ {:s}$".format(self.clf_name)
         pylab.title(title)
         pylab.legend(loc=4)
         pylab.savefig(self.figpath)
 
-    def plot_required_beta_graph(self):
-        """
-        Plots thr graph which is the required coefficient to make the ALR similar to ALBSH
-        """
+    # def plot_required_beta_graph(self):
+    #     """
+    #     Plots thr graph which is the required coefficient to make the ALR similar to ALBSH
+    #     """
+    #
+    #     def get_rbeta_for_clf_score(clf_score, clclf_scores, betas):
+    #         """
+    #         Compute the rbeta for clf_score
+    #         for a given score, look for the same clclf_score if exists, otherwise interpolate linearly
+    #         from the nearest two points, and return its beta.
+    #         """
+    #         # can be changed to binary search.. not really necessary for this amount of data
+    #         rbeta = None
+    #         for i, clclf_score in enumerate(clclf_scores):
+    #             # found an exact match for clclf
+    #             if clclf_score == clf_score:
+    #                 rbeta = betas[i]
+    #                 break
+    #             # didn't find - interpolate!
+    #             if clclf_score >= clf_score:
+    #                 # if this is the first clclf point, then we won't have a previous
+    #                 # point to interpolate with.. then leave it alone
+    #                 if i == 0: return -1
+    #                 y0 = clclf_scores[i-1]
+    #                 x0 = betas[i-1]
+    #                 y1 = clclf_score
+    #                 x1 = betas[i]
+    #                 rbeta = (clf_score - y0) * ((x1 - x0) / (y1 - y0)) + x0
+    #                 break
+    #         # if rbeta=None: it means we couldn't find a higher clclf_score,
+    #         # which means there's no relevant rbeta in this experiment..
+    #         return rbeta
+    #
+    #     print "plotting required beta graph.."
+    #     import pylab
+    #     pylab.clf()
+    #
+    #     betas = []
+    #     clf_scores = []
+    #     clclf_scores = []
+    #     trainset_sizes = []
+    #     # extract necessary data from scores file
+    #     with open(self.scores_path) as f:
+    #         s = f.read().strip()
+    #         lines = s.split('\n')
+    #         for line in lines:
+    #             enca, encb, esca, escb, dst_ds_size, trainset_size, n_units_per_fold, beta, clf_score, clclf_score = line.split('\t')
+    #             betas.append(float(beta))
+    #             clf_scores.append(float(clf_score))
+    #             clclf_scores.append(float(clclf_score))
+    #             trainset_sizes.append(int(trainset_size))
+    #
+    #     # compute the necessary data
+    #     betas_ratios = []
+    #     used_ids = []
+    #     for i, clf_score in enumerate(clf_scores):
+    #         if i >= 9: break
+    #         rbeta = get_rbeta_for_clf_score(clf_score, clclf_scores, betas)
+    #         if rbeta < 0: continue # this is when interpolation is irrelevant..
+    #         if rbeta is None: break
+    #         print trainset_sizes[i], i, clf_score, rbeta, rbeta / betas[i]
+    #         betas_ratios.append(rbeta / betas[i])
+    #         used_ids.append(i)
+    #
+    #     pylab.plot([clf_scores[id_] for id_ in used_ids], betas_ratios, 'bo', label="$bla\ bla$")
+    #     pylab.ylabel(r"$\beta s\ ratio$")
+    #     pylab.xlabel(r"$Trainset\ size$")
+    #     title = r"$Categories:\ {:s}\ vs.\ {:s}$".format(self.c_a_title, self.c_b_title)
+    #     pylab.title(title)
+    #     pylab.legend(loc=4)
+    #     pylab.savefig(self.rbetas_figpath)
+    #
+    #     return [clf_scores[id_] for id_ in used_ids], betas_ratios
 
-        def get_rbeta_for_clf_score(clf_score, clclf_scores, betas):
+    def plot_betas_graph(self):
+
+        def interpolate_x_value(given_y, ys, xs):
             """
-            Compute the rbeta for clf_score
-            for a given score, look for the same clclf_score if exists, otherwise interpolate linearly
-            from the nearest two points, and return its beta.
+            Compute the x value for given y
+            for a given y, look for the same y if exists in ys, otherwise interpolate linearly
+            from the nearest two points, and return its x.
             """
             # can be changed to binary search.. not really necessary for this amount of data
-            rbeta = None
-            for i, clclf_score in enumerate(clclf_scores):
-                # found an exact match for clclf
-                if clclf_score == clf_score:
-                    rbeta = betas[i]
+            x = None
+            for i, y in enumerate(ys):
+                # found an exact match for given_y
+                if y == given_y:
+                    x = xs[i]
                     break
                 # didn't find - interpolate!
-                if clclf_score >= clf_score:
-                    y0 = clclf_scores[i-1]
-                    x0 = betas[i-1]
-                    y1 = clclf_score
-                    x1 = betas[i]
-                    rbeta = (clf_score - y0) * ((x1 - x0) / (y1 - y0)) + x0
+                if y >= given_y:
+                    # if this is the first x point, then we won't have a previous
+                    # point to interpolate with.. then leave it alone
+                    if i == 0: return -1
+                    y0 = ys[i-1]
+                    x0 = xs[i-1]
+                    y1 = y
+                    x1 = xs[i]
+                    x = (given_y - y0) * ((x1 - x0) / (y1 - y0)) + x0
                     break
-            # if rbeta=None: it means we couldn't find a higher clclf_score,
-            # which means there's no relevant rbeta in this experiment..
-            return rbeta
+            # if x=None: it means we couldn't find a higher y,
+            # which means there's no relevant x in this experiment..
+            return x
 
-        print "plotting required beta graph.."
+        print "plotting beta graph.."
         import pylab
+        pylab.clf()
+
         betas = []
         clf_scores = []
         clclf_scores = []
@@ -332,24 +413,53 @@ class Experiment2Plotter(object):
                 clclf_scores.append(float(clclf_score))
                 trainset_sizes.append(int(trainset_size))
 
-        # compute the necessary data
-        betas_ratios = []
-        for i, clf_score in enumerate(clf_scores):
-            if i >= 9: break
-            rbeta = get_rbeta_for_clf_score(clf_score, clclf_scores, betas)
-            if rbeta is None: break
-            print trainset_sizes[i], i, clf_score, rbeta, rbeta / betas[i]
-            betas_ratios.append(rbeta / betas[i])
 
-        pylab.plot(trainset_sizes[:len(betas_ratios)], betas_ratios, label="$bla\ bla$")
-        pylab.ylabel(r"$\beta s\ ratio$")
-        pylab.xlabel(r"$Trainset\ size$")
-        # title = r"$Comparison\ between\ one-language\ Spanish\ classifier\ (10-fold CV)\ to cross-language\ classifier$"
+        # find the lowest and highest scores where clf and clclf exists
+        low = high = None
+        for clf_score in clf_scores:
+            if clf_score < clclf_scores[0]:
+                continue
+            for j, clclf_score in enumerate(clclf_scores):
+                if clclf_score <= clf_score:
+                    continue
+                low = clclf_scores[j-1]
+                break
+            if low is not None: break
+        high = max(clclf_scores) if max(clf_scores) > max(clclf_scores) else max(clclf_scores)
+
+        # get the interpolation values
+        cv_scores = []
+        betas = []
+        for cv_score in pylab.linspace(low, high, 100):
+            clf_size = interpolate_x_value(cv_score, clf_scores, trainset_sizes)
+            clclf_size = interpolate_x_value(cv_score, clclf_scores, trainset_sizes)
+            if clf_size is None or clclf_size is None: continue
+            beta = clclf_size / clf_size
+            if beta < 0: # this is irrelevant..
+                continue
+            cv_scores.append(cv_score)
+            betas.append(beta)
+
+
+        # plot the line
+        pylab.plot(cv_scores, betas, 'bo', label="$\beta line$")
+        pylab.ylabel(r"$\beta$")
+        pylab.xlabel(r"$Classifier\ score$")
+        pylab.ylim([0, 16])
+        #pylab.xlim([0.54, 1])
+        title = r"$\beta\ as\ a\ function\ of\ classifier's\ score$"
+        title += "\n"
+        title += r"$Categories:\ {:s}\ vs.\ {:s}, Algorithm:\ {:s}$".format(self.c_a_title, self.c_b_title, self.clf_name)
         # title += "\n"
-        title = r"$Categories:\ {:s}\ vs.\ {:s}$".format(self.c_a_title, self.c_b_title)
-        pylab.title(title)
-        pylab.legend(loc=4)
+        # title += r"$Algorithm:\ {:s}$".format(self.clf_name)
+        pylab.title(title, y=1.02)
+        #pylab.legend(loc=4)
         pylab.savefig(self.rbetas_figpath)
+
+
+        return cv_scores, betas
+
+
 
 
 
@@ -358,31 +468,69 @@ if __name__ == "__main__":
 
     print "HELLO"
 
-    # en_cs = ['Marxism', 'Anarchism']
-    # es_cs = ['Marxismo', 'Anarquismo']
-
-    # en_cs = ['Epistemology', 'Ethics']
-    # es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
-    #
-    # en_cs = ['Asian_art', 'Latin_American_art']
-    # es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
-    #
-    # en_cs = ['Spirituality', 'Religion']
-    # es_cs = ['Espiritualidad', urllib.quote('Religión')]
-
-    en_cs = ['Islamic_architecture', 'Modernist_architecture']
-    es_cs = [urllib.quote('Arquitectura_islámica'), 'Arquitectura_moderna']
-
     # en_cs = ['Dark_matter', 'Black_holes']
     # es_cs = ['Materia_oscura', 'Agujeros_negros']
 
+    en_cs = ['Asian_art', 'Latin_American_art']
+    es_cs = ['Arte_de_Asia', 'Arte_latinoamericano']
 
-    print "Working on:", en_cs, es_cs
+    en_cs = ['Epistemology', 'Ethics']
+    es_cs = ['Epistemolog%C3%ADa', '%C3%89tica']
+
+    # en_cs = ['Islamic_architecture', 'Modernist_architecture']
+    # es_cs = [urllib.quote('Arquitectura_islámica'), 'Arquitectura_moderna']
+
+    # en_cs = ['Marxism', 'Anarchism']
+    # es_cs = ['Marxismo', 'Anarquismo']
+
+    # en_cs = ['Spirituality', 'Religion']
+    # es_cs = ['Espiritualidad', urllib.quote('Religión')]
+
+
+    en_cs_s = [
+        ['Asian_art', 'Latin_American_art'],
+        ['Epistemology', 'Ethics'],
+        ['Islamic_architecture', 'Modernist_architecture'],
+        ['Marxism', 'Anarchism'],
+        ['Spirituality', 'Religion']
+    ]
+
+
+    # print "Working on:", en_cs, es_cs
 
     # clf1 = SimpleClassifier('es', MultinomialNB(alpha=0.01, fit_prior=False))
     # clf1 = SimpleClassifier('es', LinearSVC(C=1e10))
     # clclf1 = CrossLanguageClassifier('en', 'es', clf1.clf, Direction.Post)
     #
     # Experiment2Scorer('en', 'es', en_cs, es_cs, [clclf1], [clf1]).score()
-    # Experiment2Plotter(en_cs, es_cs).plot_scores()
-    Experiment2Plotter(en_cs, es_cs).plot_required_beta_graph()
+
+
+    for en_cs in en_cs_s:
+        Experiment2Plotter(en_cs, es_cs, 'LinearSVC').plot_scores()
+        Experiment2Plotter(en_cs, es_cs, 'LinearSVC').plot_betas_graph()
+
+
+    # xs = []
+    # ys = []
+    # for en_cs in en_cs_s:
+    #     Experiment2Plotter(en_cs, es_cs, 'MultinomialNB').plot_scores()
+    #     x, y = Experiment2Plotter(en_cs, es_cs, 'MultinomialNB').plot_required_beta_graph()
+    #     xs.append(x)
+    #     ys.append(y)
+    #
+    # # import pylab
+    # # pylab.clf()
+    # # for i, en_cs in enumerate(en_cs_s):
+    # #     x = xs[i]
+    # #     y = ys[i]
+    # #     pylab.plot(x, y, label="${:s}\ {:s}$".format(en_cs[0], en_cs[1]))
+    # #     # pylab.plot(x, y, label="aaa")
+    # #
+    # # # pylab.ylabel(r"$\beta s\ ratio$")
+    # # # pylab.xlabel(r"$Clf\ score$")
+    # # # title = r"$$"
+    # # # pylab.title(title)
+    # # pylab.legend(loc=2)
+    # # figpath = os.path.join(RESULTS_DIR, 'experiment2', 'all_betas_ratios.png')
+    # # print figpath
+    # # #pylab.savefig(figpath)
