@@ -1,0 +1,47 @@
+running experiment 1 on categories [<Category: en: Marxism>, <Category: en: Anarchism>],[<Category: es: Marxismo>, <Category: es: Anarquismo>]
+Marxism: 906
+Anarchism: 822
+Marxismo: 394
+Anarquismo: 390
+0.789541	BernoulliNB(alpha=0.001, binarize=0.0, class_prior=None, fit_prior=True)	post
+0.755102	BernoulliNB(alpha=0.001, binarize=0.0, class_prior=None, fit_prior=True)	pre
+0.781888	BernoulliNB(alpha=0.01, binarize=0.0, class_prior=None, fit_prior=True)	post
+0.743622	BernoulliNB(alpha=0.01, binarize=0.0, class_prior=None, fit_prior=True)	pre
+0.771684	BernoulliNB(alpha=0.1, binarize=0.0, class_prior=None, fit_prior=True)	post
+0.725765	BernoulliNB(alpha=0.1, binarize=0.0, class_prior=None, fit_prior=True)	pre
+0.770408	BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True)	post
+0.732143	BernoulliNB(alpha=1.0, binarize=0.0, class_prior=None, fit_prior=True)	pre
+0.788265	BernoulliNB(alpha=2.0, binarize=0.0, class_prior=None, fit_prior=True)	post
+0.755102	BernoulliNB(alpha=2.0, binarize=0.0, class_prior=None, fit_prior=True)	pre
+0.806122	BernoulliNB(alpha=3.0, binarize=0.0, class_prior=None, fit_prior=True)	post
+0.784439	BernoulliNB(alpha=3.0, binarize=0.0, class_prior=None, fit_prior=True)	pre
+0.502551	SVC(C=10000000000.0, cache_size=200, class_weight=None, coef0=0.0, degree=3,
+  gamma=0.0, kernel='sigmoid', max_iter=-1, probability=False,
+  random_state=None, shrinking=True, tol=0.001, verbose=False)	post
+0.502551	SVC(C=10000000000.0, cache_size=200, class_weight=None, coef0=0.0, degree=3,
+  gamma=0.0, kernel='sigmoid', max_iter=-1, probability=False,
+  random_state=None, shrinking=True, tol=0.001, verbose=False)	pre
+0.875000	SVC(C=10000000000.0, cache_size=200, class_weight=None, coef0=0.0, degree=3,
+  gamma=0.0, kernel='rbf', max_iter=-1, probability=False,
+  random_state=None, shrinking=True, tol=0.001, verbose=False)	post
+0.886480	SVC(C=10000000000.0, cache_size=200, class_weight=None, coef0=0.0, degree=3,
+  gamma=0.0, kernel='rbf', max_iter=-1, probability=False,
+  random_state=None, shrinking=True, tol=0.001, verbose=False)	pre
+0.502551	SVC(C=10000000000.0, cache_size=200, class_weight=None, coef0=0.0, degree=3,
+  gamma=0.0, kernel='poly', max_iter=-1, probability=False,
+  random_state=None, shrinking=True, tol=0.001, verbose=False)	post
+0.502551	SVC(C=10000000000.0, cache_size=200, class_weight=None, coef0=0.0, degree=3,
+  gamma=0.0, kernel='poly', max_iter=-1, probability=False,
+  random_state=None, shrinking=True, tol=0.001, verbose=False)	pre
+0.886480	SVC(C=10000000000.0, cache_size=200, class_weight=None, coef0=0.0, degree=3,
+  gamma=0.0, kernel='linear', max_iter=-1, probability=False,
+  random_state=None, shrinking=True, tol=0.001, verbose=False)	post
+0.882653	SVC(C=10000000000.0, cache_size=200, class_weight=None, coef0=0.0, degree=3,
+  gamma=0.0, kernel='linear', max_iter=-1, probability=False,
+  random_state=None, shrinking=True, tol=0.001, verbose=False)	pre
+0.906888	LinearSVC(C=10000000000.0, class_weight=None, dual=True, fit_intercept=True,
+     intercept_scaling=1, loss='l2', multi_class='ovr', penalty='l2',
+     random_state=None, tol=0.0001, verbose=0)	post
+0.895408	LinearSVC(C=10000000000.0, class_weight=None, dual=True, fit_intercept=True,
+     intercept_scaling=1, loss='l2', multi_class='ovr', penalty='l2',
+     random_state=None, tol=0.0001, verbose=0)	pre
