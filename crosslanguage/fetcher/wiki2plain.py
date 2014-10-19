@@ -5,6 +5,8 @@
 #   https://github.com/jinghe/hunter-gatherer/blob/master/wikipedia-process/wiki2plain.py
 #
 # Changes were made to fit crosslanguage project's goal
+#
+# Ori&Niv
 ###
 
 import re
