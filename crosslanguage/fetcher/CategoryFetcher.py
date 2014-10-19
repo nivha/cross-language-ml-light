@@ -51,13 +51,6 @@ class CategoryFetcher(object):
         """
         Iterative BFS on the category tree
         returns all articles found in the run, as wiki Page objects
-
-        :param category_title: title of needed category
-        :param max_articles_num: maximum number of articles to fetch. stops after reaching the limit
-                                 'None' means without limit.
-        :param max_depth: max depth to iterate on (in categories depth)
-        :param max_articles_per_subcategory: max number of article to take from each subcategory
-        :return:
         """
 
         closed_categories = set()
