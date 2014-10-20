@@ -21,20 +21,10 @@ class CategoryTranslator(object):
     def do_translation(self):
         target_lang_path_list = [l.to_path() for l in self.target_lang_list]
 
-        # First, remove folders with any translated content
-        # for folder in os.listdir(self.category_path):
-        #     if folder in target_lang_path_list:
-        #         shutil.rmtree(os.path.join(self.category_path, folder))
-
-        # Then, translate all files for each language
+        # translate all files for each language
         for target_lang in self.target_lang_list:
             # Determine directory for translations
             target_path = os.path.join(self.category_path, target_lang.to_path())
-
-            # Delete old folder of translations
-            # if os.path.isdir(target_path):
-            #     shutil.rmtree(target_path)
-            #     time.sleep(5)
 
             # Make new directory for translated articles
             if not os.path.exists(target_path):
@@ -72,13 +62,6 @@ def translate_all_lang_categories(source_lang, target_lang_list):
         CategoryTranslator(source_lang, target_lang_list, category_name).do_translation()
         print '> Done!'
 
-
-class DataTranslator(object):
-    """
-    Translates all data in the system
-    """
-    def __init__(self):
-        pass
 
 
 if __name__ == '__main__':
