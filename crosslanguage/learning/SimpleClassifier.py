@@ -25,7 +25,6 @@ class SimpleClassifier(object):
     Gets a classifier type and a marked list of articles (learning set).
     Returns a one-language classifier.
     """
-
     def __init__(self, language, classifier_type):
         self.language = language
         self.clf = create_simple_classifier(classifier_type)
@@ -60,11 +59,6 @@ if __name__ == '__main__':
     data = []
     target = []
     all_articles = []
-    # for category in trainc:
-    #     for article in category.article_set.all():
-    #         training_text = article.get_original_content().text
-    #         data.append(training_text)
-    #         target.append(category.name)
 
     all_articles = reduce(lambda a, b: a + b,
                           map(lambda category: list(category.article_set.all()), trainc))

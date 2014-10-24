@@ -25,10 +25,9 @@ def download_cateogries(src_language, dst_language, src_c, dst_c):
     dst_lang = Language(Language.path_to_lang[dst_language])
     CategoryTranslator(src_lang, [dst_lang], src_c).do_translation()
     CategoryTranslator(dst_lang, [src_lang], dst_c).do_translation()
-    #
+
     load_category(src_language, src_c)
     load_category(dst_language, dst_c)
-
 
 
 # download_cateogries('en', 'es', 'Religion', 'Religión')

@@ -77,7 +77,7 @@ class CrossLanguageClassifier(object):
 
     def test(self, test_articles):
         """
-
+        Tests the classifier on a given test set, and returns its score.
         :param test_articles: A list of articles to test
         :return:
         """

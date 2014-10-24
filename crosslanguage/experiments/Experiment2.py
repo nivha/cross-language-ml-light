@@ -456,12 +456,7 @@ class Experiment2Plotter(object):
         #pylab.legend(loc=4)
         pylab.savefig(self.rbetas_figpath)
 
-
         return cv_scores, betas
-
-
-
-
 
 
 if __name__ == "__main__":
@@ -485,7 +480,6 @@ if __name__ == "__main__":
 
     # en_cs = ['Spirituality', 'Religion']
     # es_cs = ['Espiritualidad', urllib.quote('Religión')]
-
 
     en_cs_s = [
         ['Asian_art', 'Latin_American_art'],
