@@ -4,7 +4,7 @@ import urllib
 from clml.Cleaner import clean_untranslated_articels, clean_english_articles_with_spanish_parallels
 
 from clml.data_load import load_category
-from clml.utils import get_category_folder, Language
+from clml.utils import Language
 from fetcher.WikiFetcher import WikiFetcher
 from translator.TranslateAll import CategoryTranslator
 
